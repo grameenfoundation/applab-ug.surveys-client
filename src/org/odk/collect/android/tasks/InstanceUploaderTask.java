@@ -50,12 +50,16 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
     private static long MAX_BYTES = 1048576-1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
     String mUrl;
+    String imei;
 
     public void setUploadServer(String newServer) {
         mUrl = newServer;
     }
 
-
+    public void setImei(String newImei) {
+    	imei = newImei;
+    }
+    
     @Override
     protected ArrayList<String> doInBackground(String... values) {
         ArrayList<String> uploadedIntances = new ArrayList<String>();
@@ -72,7 +76,9 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
             // setup client
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
+            
             HttpPost httppost = new HttpPost(mUrl);
+            httppost.setHeader("x-Imei", imei);
 
             // get instance file
             File file = new File(values[i]);

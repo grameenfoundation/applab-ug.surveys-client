@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,14 +127,25 @@ public class RemoteFileManagerList extends ListActivity implements FormDownloade
         FileUtils.createFolder(GlobalConstants.CACHE_PATH);
         mFormDownloadTask = new FormDownloaderTask();
         mFormDownloadTask.setDownloaderListener(RemoteFileManagerList.this);
-
+       
+        // Set imei to pass along with the URL;
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        String imei = telephonyManager.getDeviceId();
+        
+        if(imei != null)
+        {
+        	mFormDownloadTask.setImei(imei);
+        }
+        
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String url =
                 settings
                         .getString(ServerPreferences.KEY_SERVER, getString(R.string.default_server))
                         + "/formList";
+        
         mFormDownloadTask.setDownloadServer(url);
+        
         mFormDownloadTask.execute();
     }
 

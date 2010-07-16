@@ -41,6 +41,7 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
 
     FormDownloaderListener mStateListener;
     String mUrl;
+    String imei;
     ArrayList<String> mDownloadedForms = new ArrayList<String>();
 
     public String formList = "formlist.xml";
@@ -50,7 +51,9 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         mUrl = newServer;
     }
 
-
+    public void setImei(String newImei) {
+    	imei = newImei;
+    }
 
     @Override
     protected ArrayList<String> doInBackground(String... values) {
@@ -72,7 +75,6 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         }
     }
 
-
     private boolean downloadFile(String url, String name) {
         // create url
         URL u = null;
@@ -86,12 +88,13 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         try {
             // prevent deadlock when connection is invalid
             URLConnection c = u.openConnection();
+            c.setRequestProperty("x-Imei", imei);
             c.setConnectTimeout(GlobalConstants.CONNECTION_TIMEOUT);
             c.setReadTimeout(GlobalConstants.CONNECTION_TIMEOUT);
 
             // write connection to file
             InputStream is = c.getInputStream();
-
+           
             // if file exists, append a number
             File f;
             if (name.equals(formList)) {

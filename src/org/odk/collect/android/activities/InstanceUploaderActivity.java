@@ -19,11 +19,13 @@ package org.odk.collect.android.activities;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import org.odk.collect.android.R;
@@ -78,7 +80,18 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                     settings.getString(ServerPreferences.KEY_SERVER,
                             getString(R.string.default_server))
                             + "/submission";
+            
             mInstanceUploaderTask.setUploadServer(url);
+            
+            // Set imei to pass along with the URL;
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String imei = telephonyManager.getDeviceId();
+            
+            if(imei != null)
+            {
+            	mInstanceUploaderTask.setImei(imei);
+            }
+            
             totalCount = instances.size();
 
             // convert array list to an array
