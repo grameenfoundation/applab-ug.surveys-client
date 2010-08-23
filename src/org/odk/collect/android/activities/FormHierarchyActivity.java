@@ -38,7 +38,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.adapters.HierarchyListAdapter;
 import org.odk.collect.android.logic.FormHandler;
 import org.odk.collect.android.logic.HierarchyElement;

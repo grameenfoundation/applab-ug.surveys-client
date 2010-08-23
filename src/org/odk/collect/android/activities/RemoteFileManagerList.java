@@ -39,7 +39,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.preferences.ServerPreferences;

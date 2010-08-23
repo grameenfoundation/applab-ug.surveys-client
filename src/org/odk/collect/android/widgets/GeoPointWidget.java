@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.activities.GeoPointActivity;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;

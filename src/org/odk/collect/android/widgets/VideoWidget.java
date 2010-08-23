@@ -20,7 +20,7 @@ import java.io.File;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;
 

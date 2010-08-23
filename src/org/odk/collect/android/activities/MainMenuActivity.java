@@ -27,7 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.preferences.ServerPreferences;

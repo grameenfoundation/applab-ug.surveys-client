@@ -23,7 +23,7 @@ import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.utilities.UrlUtils;
 
 public class ServerPreferences extends PreferenceActivity implements

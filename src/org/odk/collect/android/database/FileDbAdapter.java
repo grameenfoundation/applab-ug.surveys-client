@@ -27,7 +27,7 @@ import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.util.Log;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.utilities.FileUtils;
 

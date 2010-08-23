@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.javarosa.model.xform.XFormsModule;
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 import org.odk.collect.android.listeners.FormLoaderListener;
 import org.odk.collect.android.listeners.FormSavedListener;

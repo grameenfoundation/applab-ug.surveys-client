@@ -26,7 +26,7 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.logic.GlobalConstants;
 
 /**

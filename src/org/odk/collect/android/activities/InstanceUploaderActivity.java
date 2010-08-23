@@ -28,7 +28,7 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
 import org.odk.collect.android.logic.GlobalConstants;

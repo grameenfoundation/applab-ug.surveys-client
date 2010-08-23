@@ -18,7 +18,7 @@ package org.odk.collect.android.activities;
 
 import java.util.ArrayList;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 
 import android.app.AlertDialog;

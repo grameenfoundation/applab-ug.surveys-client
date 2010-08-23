@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 
 /**
  * Builds view for arrow animation

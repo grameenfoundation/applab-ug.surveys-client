@@ -16,7 +16,7 @@
 
 package org.odk.collect.android.views;
 
-import org.odk.collect.android.R;
+import applab.surveys.client.R;
 
 import android.content.Context;
 import android.util.AttributeSet;
