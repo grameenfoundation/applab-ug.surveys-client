@@ -240,7 +240,6 @@ public class FileDbAdapter {
         }
     }
 
-
     /**
      * Get a cursor to a multiple files from the database.
      * 
@@ -517,6 +516,15 @@ public class FileDbAdapter {
         }
     }
 
+    /**
+     * deletes multiple files from the database
+     * @param fileLocations  a list of paths to files.
+     */
+    public void deleteFiles(ArrayList<String> fileLocations){    	
+        for (int i = 0; i < fileLocations.size(); i++) {
+            deleteFile(fileLocations.get(i), null);           
+        }    	
+    }
 
     public void removeOrphanInstances() {
         if (FileUtils.createFolder(GlobalConstants.INSTANCES_PATH)) {
