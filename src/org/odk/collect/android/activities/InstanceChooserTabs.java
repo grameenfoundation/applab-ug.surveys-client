@@ -16,6 +16,9 @@
 
 package org.odk.collect.android.activities;
 
+import org.odk.collect.android.database.FileDbAdapter;
+import org.odk.collect.android.logic.GlobalConstants;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -26,10 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
-
 import applab.surveys.client.R;
-import org.odk.collect.android.database.FileDbAdapter;
-import org.odk.collect.android.logic.GlobalConstants;
 
 /**
  * A host activity for {@link InstanceChooserList}.
@@ -44,14 +44,12 @@ public class InstanceChooserTabs extends TabActivity {
     private static final String SAVED_TAB = "saved_tab";
     private static final String COMPLETED_TAB = "completed_tab";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.review_data));
         refreshView();
     }
-
 
     /**
      * Build tab host view and setup tab intents.
@@ -79,26 +77,26 @@ public class InstanceChooserTabs extends TabActivity {
 
         // hack to set font size and padding in tab headers
         // arrived at these paths by using hierarchy viewer
-        LinearLayout ll = (LinearLayout) tabHost.getChildAt(0);
-        TabWidget tw = (TabWidget) ll.getChildAt(0);
+        LinearLayout ll = (LinearLayout)tabHost.getChildAt(0);
+        TabWidget tw = (TabWidget)ll.getChildAt(0);
 
-        RelativeLayout rls = (RelativeLayout) tw.getChildAt(0);
-        TextView tvs = (TextView) rls.getChildAt(1);
+        RelativeLayout rls = (RelativeLayout)tw.getChildAt(0);
+        TextView tvs = (TextView)rls.getChildAt(1);
         tvs.setTextSize(GlobalConstants.APPLICATION_FONTSIZE - 2);
         tvs.setPadding(0, 0, 0, 6);
 
-        RelativeLayout rlc = (RelativeLayout) tw.getChildAt(1);
-        TextView tvc = (TextView) rlc.getChildAt(1);
+        RelativeLayout rlc = (RelativeLayout)tw.getChildAt(1);
+        TextView tvc = (TextView)rlc.getChildAt(1);
         tvc.setTextSize(GlobalConstants.APPLICATION_FONTSIZE - 2);
         tvc.setPadding(0, 0, 0, 6);
 
         if (mSavedCount >= mCompletedCount) {
             getTabHost().setCurrentTabByTag(SAVED_TAB);
-        } else {
+        }
+        else {
             getTabHost().setCurrentTabByTag(COMPLETED_TAB);
         }
     }
-
 
     /**
      * Update count of saved and completed instances for tab host header.
@@ -122,6 +120,5 @@ public class InstanceChooserTabs extends TabActivity {
         // memory cleanup
         fda.close();
     }
-
 
 }

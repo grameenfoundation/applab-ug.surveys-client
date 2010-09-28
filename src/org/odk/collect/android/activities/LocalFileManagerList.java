@@ -18,7 +18,6 @@ package org.odk.collect.android.activities;
 
 import java.util.ArrayList;
 
-import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 
 import android.app.AlertDialog;
@@ -32,10 +31,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+import applab.surveys.client.R;
 
 /**
- * Responsible for displaying and deleting all the valid forms in the forms
- * directory.
+ * Responsible for displaying and deleting all the valid forms in the forms directory.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -48,18 +47,18 @@ public class LocalFileManagerList extends ListActivity {
     private SimpleCursorAdapter mInstances;
     private ArrayList<Long> mSelected = new ArrayList<Long>();
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.local_file_manage_list);
-        mActionButton = (Button) findViewById(R.id.delete_button);
+        mActionButton = (Button)findViewById(R.id.delete_button);
         mActionButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 
                 if (mSelected.size() > 0) {
                     createDeleteDialog();
-                } else {
+                }
+                else {
                     Toast.makeText(getApplicationContext(), R.string.noselect_error,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -67,7 +66,6 @@ public class LocalFileManagerList extends ListActivity {
         });
         // buildView takes place in resume
     }
-
 
     private void refreshView() {
         // get all mInstances that match the status.
@@ -77,8 +75,8 @@ public class LocalFileManagerList extends ListActivity {
         Cursor c = fda.fetchAllFiles();
         startManagingCursor(c);
 
-        String[] data = new String[] {FileDbAdapter.KEY_DISPLAY, FileDbAdapter.KEY_META};
-        int[] view = new int[] {R.id.text1, R.id.text2};
+        String[] data = new String[] { FileDbAdapter.KEY_DISPLAY, FileDbAdapter.KEY_META };
+        int[] view = new int[] { R.id.text1, R.id.text2 };
 
         // render total instance view
         mInstances =
@@ -91,7 +89,6 @@ public class LocalFileManagerList extends ListActivity {
         // cleanup
         fda.close();
     }
-
 
     /**
      * Create the file delete dialog
@@ -120,7 +117,6 @@ public class LocalFileManagerList extends ListActivity {
         mAlertDialog.show();
     }
 
-
     private void refreshData() {
         if (mInstances != null) {
             mInstances.getCursor().requery();
@@ -129,10 +125,8 @@ public class LocalFileManagerList extends ListActivity {
         refreshView();
     }
 
-
     /**
-     * Deletes the selected files.First from the database then from the file
-     * system
+     * Deletes the selected files.First from the database then from the file system
      */
     private void deleteSelectedFiles() {
         FileDbAdapter fda = new FileDbAdapter(this);
@@ -159,7 +153,8 @@ public class LocalFileManagerList extends ListActivity {
             if (mInstances.isEmpty()) {
                 finish();
             }
-        } else {
+        }
+        else {
             // had some failures
             Toast.makeText(
                     getApplicationContext(),
@@ -169,13 +164,12 @@ public class LocalFileManagerList extends ListActivity {
 
     }
 
-
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
         // get row id from db
-        Cursor c = (Cursor) getListAdapter().getItem(position);
+        Cursor c = (Cursor)getListAdapter().getItem(position);
         long k = c.getLong(c.getColumnIndex(FileDbAdapter.KEY_ID));
 
         // add/remove from selected list
@@ -185,7 +179,6 @@ public class LocalFileManagerList extends ListActivity {
             mSelected.add(k);
     }
 
-
     @Override
     protected void onPause() {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
@@ -193,7 +186,6 @@ public class LocalFileManagerList extends ListActivity {
         }
         super.onPause();
     }
-
 
     @Override
     protected void onResume() {

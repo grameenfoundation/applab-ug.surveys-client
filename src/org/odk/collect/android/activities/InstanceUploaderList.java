@@ -16,6 +16,12 @@
 
 package org.odk.collect.android.activities;
 
+import java.util.ArrayList;
+
+import org.odk.collect.android.database.FileDbAdapter;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.preferences.ServerPreferences;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,17 +34,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
-
 import applab.surveys.client.R;
-import org.odk.collect.android.database.FileDbAdapter;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.preferences.ServerPreferences;
-
-import java.util.ArrayList;
 
 /**
- * Responsible for displaying all the valid forms in the forms directory. Stores
- * the path to selected form for use by {@link MainMenuActivity}.
+ * Responsible for displaying all the valid forms in the forms directory. Stores the path to selected form for use by
+ * {@link MainMenuActivity}.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -55,13 +55,12 @@ public class InstanceUploaderList extends ListActivity {
     private SimpleCursorAdapter mInstances;
     private ArrayList<Long> mSelected = new ArrayList<Long>();
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.instance_uploader_list);
 
-        mActionButton = (Button) findViewById(R.id.upload_button);
+        mActionButton = (Button)findViewById(R.id.upload_button);
         mActionButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
@@ -69,7 +68,8 @@ public class InstanceUploaderList extends ListActivity {
                     // items selected
                     uploadSelectedFiles();
                     refreshData();
-                } else {
+                }
+                else {
                     // no items selected
                     Toast.makeText(getApplicationContext(), getString(R.string.noselect_error),
                             Toast.LENGTH_SHORT).show();
@@ -79,10 +79,8 @@ public class InstanceUploaderList extends ListActivity {
         });
     }
 
-
     /**
-     * Retrieves instance information from {@link FileDbAdapter}, composes and
-     * displays each row.
+     * Retrieves instance information from {@link FileDbAdapter}, composes and displays each row.
      */
     private void refreshView() {
         // get all mInstances that match the status.
@@ -91,8 +89,8 @@ public class InstanceUploaderList extends ListActivity {
         Cursor c = fda.fetchFilesByType(FileDbAdapter.TYPE_INSTANCE, FileDbAdapter.STATUS_COMPLETE);
         startManagingCursor(c);
 
-        String[] data = new String[] {FileDbAdapter.KEY_DISPLAY, FileDbAdapter.KEY_META};
-        int[] view = new int[] {R.id.text1, R.id.text2};
+        String[] data = new String[] { FileDbAdapter.KEY_DISPLAY, FileDbAdapter.KEY_META };
+        int[] view = new int[] { R.id.text1, R.id.text2 };
 
         // render total instance view
         mInstances =
@@ -108,7 +106,6 @@ public class InstanceUploaderList extends ListActivity {
         // cleanup
         fda.close();
     }
-
 
     private void uploadSelectedFiles() {
         ArrayList<String> selectedInstances = new ArrayList<String>();
@@ -133,7 +130,6 @@ public class InstanceUploaderList extends ListActivity {
         fda.close();
     }
 
-
     private void refreshData() {
         if (mInstances != null) {
             mInstances.getCursor().requery();
@@ -142,7 +138,6 @@ public class InstanceUploaderList extends ListActivity {
         refreshView();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -150,7 +145,6 @@ public class InstanceUploaderList extends ListActivity {
                 android.R.drawable.ic_menu_preferences);
         return true;
     }
-
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -162,19 +156,17 @@ public class InstanceUploaderList extends ListActivity {
         return super.onMenuItemSelected(featureId, item);
     }
 
-
     private void createPreferencesMenu() {
         Intent i = new Intent(this, ServerPreferences.class);
         startActivity(i);
     }
-
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
         // get row id from db
-        Cursor c = (Cursor) getListAdapter().getItem(position);
+        Cursor c = (Cursor)getListAdapter().getItem(position);
         long k = c.getLong(c.getColumnIndex(FileDbAdapter.KEY_ID));
 
         // add/remove from selected list
@@ -184,13 +176,11 @@ public class InstanceUploaderList extends ListActivity {
             mSelected.add(k);
     }
 
-
     @Override
     protected void onResume() {
         refreshData();
         super.onResume();
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {

@@ -16,6 +16,11 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.R;
 import android.content.Context;
 import android.text.method.TextKeyListener;
@@ -24,11 +29,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
 
 /**
  * The most basic widget that allows for entry of any text.
@@ -42,31 +42,27 @@ public class StringWidget extends EditText implements IQuestionWidget {
         this(context, null);
     }
 
-
     public StringWidget(Context context, AttributeSet attrs) {
         this(context, attrs, R.attr.editTextStyle);
     }
-
 
     public StringWidget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-
     public void clearAnswer() {
         setText(null);
     }
-
 
     public IAnswerData getAnswer() {
         String s = getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        } else {
+        }
+        else {
             return new StringData(s);
         }
     }
-
 
     public void buildView(PromptElement prompt) {
         // font size
@@ -90,13 +86,12 @@ public class StringWidget extends EditText implements IQuestionWidget {
         }
     }
 
-
     public void setFocus(Context context) {
         // Put focus on text input field and display soft keyboard if
         // appropriate.
         this.requestFocus();
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(this, 0);
     }
 

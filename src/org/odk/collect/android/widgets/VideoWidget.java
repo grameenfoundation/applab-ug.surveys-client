@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import applab.surveys.client.R;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;
 
@@ -37,11 +36,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import applab.surveys.client.R;
 
 /**
- * Widget that allows user to take pictures, sounds or video and add them to the
- * form.
+ * Widget that allows user to take pictures, sounds or video and add them to the form.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -64,16 +62,13 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
     private int mReplaceText;
     private int mPlayText;
 
-
     public VideoWidget(Context context, String instancePath) {
         super(context);
         initialize(instancePath);
     }
 
-
     private void initialize(String instancePath) {
         mInstanceFolder = instancePath.substring(0, instancePath.lastIndexOf("/") + 1);
-
 
         mExternalUri = Video.Media.EXTERNAL_CONTENT_URI;
         mCaptureIntent = android.provider.MediaStore.ACTION_VIDEO_CAPTURE;
@@ -83,7 +78,6 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         mPlayText = R.string.play_video;
 
     }
-
 
     private void deleteMedia() {
         // get the file path and delete the file
@@ -96,7 +90,6 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         mBinaryName = null;
     }
 
-
     public void clearAnswer() {
         // remove the file
         deleteMedia();
@@ -107,15 +100,14 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         mDisplayText.setText(getContext().getString(R.string.no_capture));
     }
 
-
     public IAnswerData getAnswer() {
         if (mBinaryName != null) {
             return new StringData(mBinaryName.toString());
-        } else {
+        }
+        else {
             return null;
         }
     }
-
 
     public void buildView(PromptElement prompt) {
         setOrientation(LinearLayout.VERTICAL);
@@ -133,8 +125,7 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
             public void onClick(View v) {
                 Intent i = new Intent(mCaptureIntent);
                 i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mExternalUri.toString());
-                ((Activity) getContext()).startActivityForResult(i, mRequestCode);
-
+                ((Activity)getContext()).startActivityForResult(i, mRequestCode);
 
             }
         });
@@ -151,7 +142,7 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
                 Intent i = new Intent("android.intent.action.VIEW");
                 File f = new File(mInstanceFolder + "/" + mBinaryName);
                 i.setDataAndType(Uri.fromFile(f), "video/*");
-                ((Activity) getContext()).startActivity(i);
+                ((Activity)getContext()).startActivity(i);
 
             }
         });
@@ -165,7 +156,8 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
             mPlayButton.setEnabled(true);
             mCaptureButton.setText(getContext().getString(mReplaceText));
             mDisplayText.setText(getContext().getString(R.string.one_capture));
-        } else {
+        }
+        else {
             mPlayButton.setEnabled(false);
             mDisplayText.setText(getContext().getString(R.string.no_capture));
         }
@@ -175,7 +167,6 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         addView(mPlayButton);
 
     }
-
 
     private Uri getUriFromPath(String path) {
         // find entry in content provider
@@ -190,7 +181,6 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         return Uri.parse(newPath);
     }
 
-
     private String getPathFromUri(Uri uri) {
         // find entry in content provider
         Cursor c = getContext().getContentResolver().query(uri, null, null, null, null);
@@ -202,8 +192,6 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         return colString;
     }
 
-
-
     public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. remove the media.
         if (mBinaryName != null) {
@@ -211,7 +199,7 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         }
 
         // get the file path and move the file
-        String binarypath = getPathFromUri((Uri) binaryuri);
+        String binarypath = getPathFromUri((Uri)binaryuri);
 
         File f = new File(binarypath);
         String s = mInstanceFolder + "/" + binarypath.substring(binarypath.lastIndexOf('/') + 1);
@@ -224,11 +212,10 @@ public class VideoWidget extends LinearLayout implements IQuestionWidget, IBinar
         mBinaryName = s.substring(s.lastIndexOf('/') + 1);
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

@@ -24,25 +24,14 @@ the License.
     android:layout_marginRight="0px"
     android:layout_marginTop="0px"
     android:layout_marginBottom="0px">
-  
-  <TextView
-    android:gravity="center"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="6px"
-    android:paddingBottom="1px"
-    android:textSize="21px"
-    android:textStyle="bold"
-    android:text="@string/main_menu_message" />
-  
-  <TextView
-    android:gravity="center"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="1px"
-    android:paddingBottom="10px"
-    android:text="@string/main_menu_details" />
+  <TextView android:gravity="left" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:paddingTop="1px"
+			android:paddingLeft="6px" android:paddingBottom="6px"
+			android:textColor="@drawable/black" android:text="@string/enter_id" />
 
+		<EditText android:id="@+id/id_field" android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+		</EditText>
   <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
@@ -73,6 +62,32 @@ the License.
           android:layout_height="wrap_content"
           android:textSize="2pt" />
 
+
+          <Button
+          android:id="@+id/register_farmer_button"
+          android:textSize="21px"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content" 
+          android:padding="20px"/>
+        
+          <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="2pt" />
+          
+          
+          <Button
+          android:id="@+id/forgot_id_button"
+          android:textSize="21px"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content" 
+          android:padding="20px"/>
+        
+          <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="2pt" />
+          
           <Button
           android:id="@+id/review_data"
           android:textSize="21px"

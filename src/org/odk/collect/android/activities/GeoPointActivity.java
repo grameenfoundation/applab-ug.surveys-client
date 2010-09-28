@@ -27,7 +27,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import applab.surveys.client.R;
 
 public class GeoPointActivity extends Activity implements LocationListener {
@@ -39,7 +38,6 @@ public class GeoPointActivity extends Activity implements LocationListener {
     // default location accuracy
     private static double LOCATION_ACCURACY = 5;
 
-
     /*
      * (non-Javadoc)
      * 
@@ -47,15 +45,14 @@ public class GeoPointActivity extends Activity implements LocationListener {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        
+
         super.onCreate(savedInstanceState);
 
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.get_location));
 
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         setupLocationDialog();
     }
-
 
     /*
      * (non-Javadoc)
@@ -64,7 +61,7 @@ public class GeoPointActivity extends Activity implements LocationListener {
      */
     @Override
     protected void onPause() {
-        
+
         super.onPause();
 
         // stops the GPS. Note that this will turn off the GPS if the screen
@@ -73,9 +70,9 @@ public class GeoPointActivity extends Activity implements LocationListener {
 
         // We're not using managed dialogs, so we have to dismiss the dialog to
         // prevent it from leaking memory.
-        if (mLocationDialog != null && mLocationDialog.isShowing()) mLocationDialog.dismiss();
+        if (mLocationDialog != null && mLocationDialog.isShowing())
+            mLocationDialog.dismiss();
     }
-
 
     /*
      * (non-Javadoc)
@@ -91,10 +88,8 @@ public class GeoPointActivity extends Activity implements LocationListener {
         mLocationDialog.show();
     }
 
-
     /**
-     * Sets up the look and actions for the progress dialog while the GPS is
-     * searching.
+     * Sets up the look and actions for the progress dialog while the GPS is searching.
      */
     private void setupLocationDialog() {
         // dialog displayed while fetching gps location
@@ -126,23 +121,20 @@ public class GeoPointActivity extends Activity implements LocationListener {
                 geopointButtonListener);
     }
 
-
     private void returnLocation() {
         if (mLocation != null) {
             Intent i = new Intent();
-            i.putExtra("LOCATION_RESULT", mLocation.getLatitude() + " " + mLocation.getLongitude() +  " " + mLocation.getAltitude() + " " + mLocation.getAccuracy());
+            i.putExtra("LOCATION_RESULT", mLocation.getLatitude() + " " + mLocation.getLongitude() + " " + mLocation.getAltitude() + " "
+                    + mLocation.getAccuracy());
             setResult(RESULT_OK, i);
         }
         finish();
     }
 
-
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * android.location.LocationListener#onLocationChanged(android.location.
-     * Location)
+     * @see android.location.LocationListener#onLocationChanged(android.location. Location)
      */
     public void onLocationChanged(Location location) {
 
@@ -153,12 +145,10 @@ public class GeoPointActivity extends Activity implements LocationListener {
         }
     }
 
-
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * android.location.LocationListener#onProviderDisabled(java.lang.String)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     public void onProviderDisabled(String provider) {
         Toast
@@ -167,23 +157,19 @@ public class GeoPointActivity extends Activity implements LocationListener {
         finish();
     }
 
-
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * android.location.LocationListener#onProviderEnabled(java.lang.String)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     public void onProviderEnabled(String provider) {
 
     }
 
-
     /*
      * (non-Javadoc)
      * 
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String,
-     * int, android.os.Bundle)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
      */
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
@@ -197,7 +183,5 @@ public class GeoPointActivity extends Activity implements LocationListener {
                 break;
         }
     }
-
-
 
 }

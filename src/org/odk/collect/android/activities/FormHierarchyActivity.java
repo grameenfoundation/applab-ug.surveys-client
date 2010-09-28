@@ -16,16 +16,11 @@
 
 package org.odk.collect.android.activities;
 
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ListView;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -38,24 +33,27 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.formmanager.view.FormElementBinding;
-import applab.surveys.client.R;
 import org.odk.collect.android.adapters.HierarchyListAdapter;
 import org.odk.collect.android.logic.FormHandler;
 import org.odk.collect.android.logic.HierarchyElement;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+import applab.surveys.client.R;
 
 /**
  * 
- * TODO: WARNING, this file is by no means complete, or correct for that matter.
- * It is hacky attempt #1 to make a hierarchy viewer by stealing a bunch of
- * things from formHandler. JavaRosa should give us better methods to accomplish
- * this (and will in the future...fingers crossed) But until then, we're
- * trying...
+ * TODO: WARNING, this file is by no means complete, or correct for that matter. It is hacky attempt #1 to make a
+ * hierarchy viewer by stealing a bunch of things from formHandler. JavaRosa should give us better methods to accomplish
+ * this (and will in the future...fingers crossed) But until then, we're trying...
  * 
  */
 public class FormHierarchyActivity extends ListActivity {
@@ -76,7 +74,6 @@ public class FormHierarchyActivity extends ListActivity {
     private FormIndex mCurrentIndex;
     List<HierarchyElement> formList;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +92,15 @@ public class FormHierarchyActivity extends ListActivity {
             mCurrentIndex = mForm.incrementIndex(mCurrentIndex);
         }
 
-        mBackButton = (Button) findViewById(R.id.backbutton);
+        mBackButton = (Button)findViewById(R.id.backbutton);
         mBackButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mCurrentIndex = stepIndexOut(mCurrentIndex);
                 if (mCurrentIndex == null || indexIsBeginning(mCurrentIndex)) {
                     mCurrentIndex = FormIndex.createBeginningOfFormIndex();
                     mCurrentIndex = mForm.incrementIndex(mCurrentIndex);
-                } else {
+                }
+                else {
 
                     FormIndex levelTest = mCurrentIndex;
                     int level = 0;
@@ -122,7 +120,8 @@ public class FormHierarchyActivity extends ListActivity {
                         }
                         if (tempIndex.getLocalIndex() == 0) {
                             done = true;
-                        } else {
+                        }
+                        else {
                             mCurrentIndex = prevIndex(mCurrentIndex);
                         }
 
@@ -135,7 +134,7 @@ public class FormHierarchyActivity extends ListActivity {
             }
         });
 
-        Button jumpButton = (Button) findViewById(R.id.jumpbutton);
+        Button jumpButton = (Button)findViewById(R.id.jumpbutton);
         jumpButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 createJumpDialog();
@@ -144,9 +143,8 @@ public class FormHierarchyActivity extends ListActivity {
         refreshView();
     }
 
-
     private void createJumpDialog() {
-        final String[] items = {getString(R.string.jump_to_start), getString(R.string.jump_to_end)};
+        final String[] items = { getString(R.string.jump_to_start), getString(R.string.jump_to_end) };
         AlertDialog mJumpDialog =
                 new AlertDialog.Builder(this).setTitle(R.string.jump_to).setItems(items,
                         new DialogInterface.OnClickListener() {
@@ -155,7 +153,8 @@ public class FormHierarchyActivity extends ListActivity {
                                     mCurrentIndex = FormIndex.createBeginningOfFormIndex();
                                     FormEntryActivity.mFormHandler.setFormIndex(mCurrentIndex);
                                     finish();
-                                } else {
+                                }
+                                else {
                                     mCurrentIndex = FormIndex.createEndOfFormIndex();
                                     FormEntryActivity.mFormHandler.setFormIndex(mCurrentIndex);
                                     finish();
@@ -165,14 +164,11 @@ public class FormHierarchyActivity extends ListActivity {
         mJumpDialog.show();
     }
 
-
     /*
-     * This is a very not ideal way to do this, but JR needs to have some
-     * mechanism detect the 'level' of an index and it doesn't right now. This
-     * basically turns a formindex to a string and checks to see if it contains
-     * two commas and an underscore. If there's no underscore you're at the root
-     * level of a form (ie 8, 0, 0, 0). If there is, you're probably in an
-     * instance of a repeated group (ie 3, 2_0, 0).
+     * This is a very not ideal way to do this, but JR needs to have some mechanism detect the 'level' of an index and
+     * it doesn't right now. This basically turns a formindex to a string and checks to see if it contains two commas
+     * and an underscore. If there's no underscore you're at the root level of a form (ie 8, 0, 0, 0). If there is,
+     * you're probably in an instance of a repeated group (ie 3, 2_0, 0).
      */
     private boolean indexIsBeginning(FormIndex fi) {
         String startTest = fi.toString();
@@ -183,7 +179,6 @@ public class FormHierarchyActivity extends ListActivity {
         return beginning;
     }
 
-
     public void refreshView() {
         formList = new ArrayList<HierarchyElement>();
 
@@ -192,8 +187,8 @@ public class FormHierarchyActivity extends ListActivity {
         // would like to use this, but it's broken and changes the currentIndex
         // TODO: fix in javarosa.
         /*
-         * FormIndex startTest = stepIndexOut(currentIndex); Log.e("carl",
-         * "starttest = " + startTest); boolean beginning = (startTest == null);
+         * FormIndex startTest = stepIndexOut(currentIndex); Log.e("carl", "starttest = " + startTest); boolean
+         * beginning = (startTest == null);
          */
 
         // begin hack around:
@@ -229,7 +224,8 @@ public class FormHierarchyActivity extends ListActivity {
             displayGroup = mForm.getChildInstanceRef(prevIndex).toString(false);
 
             mBackButton.setEnabled(true);
-        } else {
+        }
+        else {
             currentIndex = FormIndex.createBeginningOfFormIndex();
             currentIndex = nextRelevantIndex(currentIndex);
             mBackButton.setEnabled(false);
@@ -260,7 +256,8 @@ public class FormHierarchyActivity extends ListActivity {
                 // the last repeated group doesn't exist, so make sure the next
                 // item is still in the group.
                 FormIndex nextIndex = nextRelevantIndex(currentIndex);
-                if (nextIndex.isEndOfFormIndex()) break;
+                if (nextIndex.isEndOfFormIndex())
+                    break;
                 String nextIndexName = mForm.getChildInstanceRef(nextIndex).toString(false);
                 if (repeatIndex != normalizedLevel.getInstanceIndex()
                         && nextIndexName.startsWith(repeatGroup)) {
@@ -279,7 +276,7 @@ public class FormHierarchyActivity extends ListActivity {
             }
 
             if (e instanceof GroupDef) {
-                GroupDef g = (GroupDef) e;
+                GroupDef g = (GroupDef)e;
                 // h += "\t" + g.getLongText() + "\t" + g.getRepeat();
 
                 if (g.getRepeat() && !currentGroupName.startsWith(repeatGroup)) {
@@ -289,7 +286,8 @@ public class FormHierarchyActivity extends ListActivity {
                     repeatGroup = currentGroupName;
                     repeatIndex = normalizedLevel.getInstanceIndex();
                     FormIndex nextIndex = nextRelevantIndex(currentIndex);
-                    if (nextIndex.isEndOfFormIndex()) break;
+                    if (nextIndex.isEndOfFormIndex())
+                        break;
                     String nextIndexName = mForm.getChildInstanceRef(nextIndex).toString(false);
                     // Make sure the next element is in this group, else no
                     // reason to add it
@@ -307,14 +305,16 @@ public class FormHierarchyActivity extends ListActivity {
                         group.AddChild(new HierarchyElement(mIndent + repeatedGroupName + " "
                                 + groupCount++, "", null, Color.LTGRAY, CHILD, currentIndex));
                         formList.add(group);
-                    } else {
+                    }
+                    else {
                         Log.e(t, "no children, so skipping");
                     }
                     currentIndex = nextRelevantIndex(currentIndex);
                     continue;
                 }
-            } else if (e instanceof QuestionDef) {
-                QuestionDef q = (QuestionDef) e;
+            }
+            else if (e instanceof QuestionDef) {
+                QuestionDef q = (QuestionDef)e;
                 // h += "\t" + q.getLongText();
                 // Log.e("FHV", h);
                 String answer = "";
@@ -323,9 +323,10 @@ public class FormHierarchyActivity extends ListActivity {
                 if (a != null) {
                     if (feb.instanceNode.dataType == Constants.DATATYPE_DATE) {
                         answer =
-                                new SimpleDateFormat("MMM dd, yyyy").format((Date) ((DateData) a)
+                                new SimpleDateFormat("MMM dd, yyyy").format((Date)((DateData)a)
                                         .getValue());
-                    } else {
+                    }
+                    else {
                         answer = a.getDisplayText();
                     }
                 }
@@ -334,7 +335,8 @@ public class FormHierarchyActivity extends ListActivity {
 
                 formList.add(new HierarchyElement(questionText, answer, null, Color.WHITE,
                         QUESTION, currentIndex));
-            } else {
+            }
+            else {
                 Log.e(t, "we shouldn't get here");
             }
 
@@ -346,18 +348,17 @@ public class FormHierarchyActivity extends ListActivity {
         setListAdapter(itla);
     }
 
-
     // used to go 'back', the only problem is this changes whatever it's
     // referencing
     public FormIndex stepIndexOut(FormIndex index) {
         if (index.isTerminal()) {
             return null;
-        } else {
+        }
+        else {
             index.setNextLevel(stepIndexOut(index.getNextLevel()));
             return index;
         }
     }
-
 
     private FormIndex prevIndex(FormIndex index) {
         do {
@@ -366,10 +367,9 @@ public class FormHierarchyActivity extends ListActivity {
         return index;
     }
 
-
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        HierarchyElement h = (HierarchyElement) l.getItemAtPosition(position);
+        HierarchyElement h = (HierarchyElement)l.getItemAtPosition(position);
 
         switch (h.getType()) {
             case EXPANDED:
@@ -416,7 +416,6 @@ public class FormHierarchyActivity extends ListActivity {
         this.getListView().setSelection(position);
     }
 
-
     private FormIndex nextRelevantIndex(FormIndex index) {
         do {
             index = mForm.incrementIndex(index);
@@ -424,15 +423,14 @@ public class FormHierarchyActivity extends ListActivity {
         return index;
     }
 
-
     private boolean isRelevant(FormIndex questionIndex) {
         TreeReference ref = mForm.getChildInstanceRef(questionIndex);
         boolean isAskNewRepeat = false;
 
         Vector<IFormElement> defs = getIndexVector(questionIndex);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
         if (last instanceof GroupDef
-                && ((GroupDef) last).getRepeat()
+                && ((GroupDef)last).getRepeat()
                 && mForm.getDataModel().resolveReference(mForm.getChildInstanceRef(questionIndex)) == null) {
             isAskNewRepeat = true;
         }
@@ -440,15 +438,15 @@ public class FormHierarchyActivity extends ListActivity {
         boolean relevant;
         if (isAskNewRepeat) {
             relevant = mForm.canCreateRepeat(ref);
-        } else {
+        }
+        else {
             TreeElement node = mForm.getDataModel().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first
         }
 
         if (relevant) {
             /*
-             * if instance flag/condition says relevant, we still have check the
-             * <group>/<repeat> hierarchy
+             * if instance flag/condition says relevant, we still have check the <group>/<repeat> hierarchy
              */
             FormIndex ancestorIndex = null;
             FormIndex cur = null;
@@ -458,7 +456,8 @@ public class FormHierarchyActivity extends ListActivity {
                 if (ancestorIndex == null) {
                     ancestorIndex = next;
                     cur = next;
-                } else {
+                }
+                else {
                     cur.setNextLevel(next);
                     cur = next;
                 }
@@ -476,12 +475,10 @@ public class FormHierarchyActivity extends ListActivity {
         return relevant;
     }
 
-
     @SuppressWarnings("unchecked")
     public Vector<IFormElement> getIndexVector(FormIndex index) {
         return mForm.explodeIndex(index);
     }
-
 
     public boolean isEnd(FormIndex mCurrentIndex) {
         if (mCurrentIndex.isEndOfFormIndex())

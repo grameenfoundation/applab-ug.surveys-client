@@ -16,6 +16,11 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -28,13 +33,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
 import applab.surveys.client.R;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
-
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.
@@ -46,11 +45,9 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
     private Button mActionButton;
     private TextView mStringAnswer;
 
-
     public BarcodeWidget(Context context) {
         super(context);
     }
-
 
     public void clearAnswer() {
         mStringAnswer.setText(null);
@@ -58,16 +55,15 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
 
     }
 
-
     public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        } else {
+        }
+        else {
             return new StringData(s);
         }
     }
-
 
     public void buildView(PromptElement prompt) {
         setOrientation(LinearLayout.VERTICAL);
@@ -84,9 +80,10 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
             public void onClick(View v) {
                 Intent i = new Intent("com.google.zxing.client.android.SCAN");
                 try {
-                    ((Activity) getContext()).startActivityForResult(i,
+                    ((Activity)getContext()).startActivityForResult(i,
                             GlobalConstants.BARCODE_CAPTURE);
-                } catch (ActivityNotFoundException e) {
+                }
+                catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
                             getContext().getString(R.string.barcode_scanner_error),
                             Toast.LENGTH_SHORT).show();
@@ -109,19 +106,17 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
         addView(mStringAnswer);
     }
 
-
     /**
      * Allows answer to be set externally in {@Link FormEntryActivity}.
      */
     public void setBinaryData(Object answer) {
-        mStringAnswer.setText((String) answer);
+        mStringAnswer.setText((String)answer);
     }
-
 
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

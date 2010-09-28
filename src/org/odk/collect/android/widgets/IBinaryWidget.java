@@ -16,7 +16,6 @@
 
 package org.odk.collect.android.widgets;
 
-
 /**
  * Interface implemented by widgets that need binary data.
  * 

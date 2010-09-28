@@ -16,10 +16,10 @@
 
 package org.odk.collect.android.widgets;
 
-import android.content.Context;
-
 import org.javarosa.core.model.Constants;
 import org.odk.collect.android.logic.PromptElement;
+
+import android.content.Context;
 
 /**
  * Convenience class that handles creation of widgets.
@@ -31,12 +31,15 @@ public class WidgetFactory {
     /**
      * Returns the appropriate QuestionWidget for the given PromptElement.
      * 
-     * @param pe prompt element to be rendered
-     * @param context Android context
-     * @param instancePath path to the instance file
+     * @param pe
+     *            prompt element to be rendered
+     * @param context
+     *            Android context
+     * @param instancePath
+     *            path to the instance file
      */
     static public IQuestionWidget createWidgetFromPrompt(PromptElement pe, Context context,
-            String instancePath) {
+                                                         String instancePath) {
         IQuestionWidget questionWidget = null;
         switch (pe.getQuestionType()) {
             case Constants.CONTROL_INPUT:

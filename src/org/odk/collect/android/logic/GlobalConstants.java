@@ -16,7 +16,6 @@
 
 package org.odk.collect.android.logic;
 
-
 /**
  * The constants used in multiple classes in this application.
  * 
@@ -44,7 +43,7 @@ public class GlobalConstants {
      * Request code for returning video data from mediarecorder intent.
      */
     public static final int VIDEO_CAPTURE = 4;
-    
+
     /**
      * Request code for returning video data from geopoint intent.
      */
@@ -85,7 +84,6 @@ public class GlobalConstants {
      */
     public static final String CACHE_PATH = "/sdcard/odk/.cache/";
 
-
     /**
      * Identifies the location of the form used to launch form entry
      */
@@ -93,7 +91,6 @@ public class GlobalConstants {
     public static final String KEY_INSTANCEPATH = "instancepath";
     public static final String KEY_INSTANCES = "instances";
     public static final String KEY_SUCCESS = "success";
-
 
     /**
      * How long to wait when opening network connection in milliseconds
@@ -119,7 +116,7 @@ public class GlobalConstants {
      * Classes needed to serialize objects
      */
     public final static String[] SERIALIABLE_CLASSES =
-            {"org.javarosa.core.model.FormDef", "org.javarosa.core.model.GroupDef",
+            { "org.javarosa.core.model.FormDef", "org.javarosa.core.model.GroupDef",
                     "org.javarosa.core.model.QuestionDef", "org.javarosa.core.model.data.DateData",
                     "org.javarosa.core.model.data.DateTimeData",
                     "org.javarosa.core.model.data.DecimalData",
@@ -144,6 +141,7 @@ public class GlobalConstants {
                     "org.javarosa.xpath.expr.XPathPathExpr",
                     "org.javarosa.xpath.expr.XPathStringLiteral",
                     "org.javarosa.xpath.expr.XPathUnionExpr",
-                    "org.javarosa.xpath.expr.XPathVariableReference"};
+                    "org.javarosa.xpath.expr.XPathVariableReference" };
 
+    public static String intervieweeName;
 }

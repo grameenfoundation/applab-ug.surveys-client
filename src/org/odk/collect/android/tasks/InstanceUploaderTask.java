@@ -37,7 +37,6 @@ import org.odk.collect.android.logic.GlobalConstants;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 /**
  * Background task for uploading completed forms.
  * 
@@ -47,7 +46,7 @@ import android.util.Log;
 public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<String>> {
 
     private static String t = "InstanceUploaderTask";
-    private static long MAX_BYTES = 1048576-1024; // 1MB less 1KB overhead
+    private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
     String mUrl;
     String imei;
@@ -57,9 +56,9 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
     }
 
     public void setImei(String newImei) {
-    	imei = newImei;
+        imei = newImei;
     }
-    
+
     @Override
     protected ArrayList<String> doInBackground(String... values) {
         ArrayList<String> uploadedIntances = new ArrayList<String>();
@@ -76,7 +75,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
             // setup client
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
-            
+
             HttpPost httppost = new HttpPost(mUrl);
             httppost.setHeader("x-Imei", imei);
 
@@ -100,34 +99,42 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
                     if (fb.getContentLength() <= MAX_BYTES) {
                         entity.addPart("xml_submission_file", fb);
                         Log.i(t, "added xml file " + f.getName());
-                    } else {
+                    }
+                    else {
                         Log.i(t, "file " + f.getName() + " is too big");
                     }
-                } else if (f.getName().endsWith(".jpg")) {
+                }
+                else if (f.getName().endsWith(".jpg")) {
                     fb = new FileBody(f, "image/jpeg");
                     if (fb.getContentLength() <= MAX_BYTES) {
                         entity.addPart(f.getName(), fb);
                         Log.i(t, "added image file " + f.getName());
-                    } else {
+                    }
+                    else {
                         Log.i(t, "file " + f.getName() + " is too big");
                     }
-                } else if (f.getName().endsWith(".3gpp")) {
+                }
+                else if (f.getName().endsWith(".3gpp")) {
                     fb = new FileBody(f, "audio/3gpp");
                     if (fb.getContentLength() <= MAX_BYTES) {
                         entity.addPart(f.getName(), fb);
                         Log.i(t, "added audio file " + f.getName());
-                    } else {
+                    }
+                    else {
                         Log.i(t, "file " + f.getName() + " is too big");
                     }
-                } else if (f.getName().endsWith(".3gp")) {
+                }
+                else if (f.getName().endsWith(".3gp")) {
                     fb = new FileBody(f, "video/3gpp");
                     if (fb.getContentLength() <= MAX_BYTES) {
                         entity.addPart(f.getName(), fb);
                         Log.i(t, "added video file " + f.getName());
-                    } else {
+                    }
+                    else {
                         Log.i(t, "file " + f.getName() + " is too big");
                     }
-                } else {
+                }
+                else {
                     Log.w(t, "unsupported file type, not adding file: " + f.getName());
                 }
             }
@@ -137,13 +144,16 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             HttpResponse response = null;
             try {
                 response = httpclient.execute(httppost);
-            } catch (ClientProtocolException e) {
+            }
+            catch (ClientProtocolException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            } catch (IllegalStateException e) {
+            }
+            catch (IllegalStateException e) {
                 e.printStackTrace();
                 return uploadedIntances;
             }
@@ -154,13 +164,13 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             Header[] h = response.getHeaders("Location");
             if (h != null && h.length > 0) {
                 serverLocation = h[0].getValue();
-            } else {
+            }
+            else {
                 // something should be done here...
                 Log.e(t, "Location header was absent");
             }
             int responseCode = response.getStatusLine().getStatusCode();
             Log.e(t, "Response code:" + responseCode);
-
 
             // verify that your response came from a known server
             if (serverLocation != null && mUrl.contains(serverLocation) && responseCode == 201) {
@@ -172,7 +182,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
         return uploadedIntances;
     }
 
-
     @Override
     protected void onPostExecute(ArrayList<String> value) {
         synchronized (this) {
@@ -181,7 +190,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
-
 
     @Override
     protected void onProgressUpdate(Integer... values) {
@@ -192,7 +200,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
-
 
     public void setUploaderListener(InstanceUploaderListener sl) {
         synchronized (this) {

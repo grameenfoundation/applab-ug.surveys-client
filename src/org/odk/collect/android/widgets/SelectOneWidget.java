@@ -16,11 +16,7 @@
 
 package org.odk.collect.android.widgets;
 
-import android.content.Context;
-import android.util.TypedValue;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import java.util.Enumeration;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -29,7 +25,11 @@ import org.javarosa.core.util.OrderedHashtable;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;
 
-import java.util.Enumeration;
+import android.content.Context;
+import android.util.TypedValue;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 /**
  * SelectOneWidgets handles select-one fields using radio buttons.
@@ -42,27 +42,24 @@ public class SelectOneWidget extends RadioGroup implements IQuestionWidget {
     private int mRadioChecked = -1;
     OrderedHashtable mItems;
 
-
     public SelectOneWidget(Context context) {
         super(context);
     }
-
 
     public void clearAnswer() {
         clearCheck();
     }
 
-
     public IAnswerData getAnswer() {
         int i = getCheckedRadioButtonId();
         if (i == -1) {
             return null;
-        } else {
-            String s = (String) mItems.elementAt(i - 1);
+        }
+        else {
+            String s = (String)mItems.elementAt(i - 1);
             return new SelectOneData(new Selection(s));
         }
     }
-
 
     @SuppressWarnings("unchecked")
     public void buildView(final PromptElement prompt) {
@@ -78,7 +75,7 @@ public class SelectOneWidget extends RadioGroup implements IQuestionWidget {
 
         String s = null;
         if (prompt.getAnswerValue() != null) {
-            s = ((Selection) prompt.getAnswerObject()).getValue();
+            s = ((Selection)prompt.getAnswerObject()).getValue();
         }
 
         if (prompt.getSelectItems() != null) {
@@ -90,8 +87,8 @@ public class SelectOneWidget extends RadioGroup implements IQuestionWidget {
             // android radio ids start at 1, not 0
             int i = 1;
             while (e.hasMoreElements()) {
-                k = (String) e.nextElement();
-                v = (String) h.get(k);
+                k = (String)e.nextElement();
+                v = (String)h.get(k);
 
                 RadioButton r = new RadioButton(getContext());
                 r.setText(k);
@@ -111,11 +108,10 @@ public class SelectOneWidget extends RadioGroup implements IQuestionWidget {
         }
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

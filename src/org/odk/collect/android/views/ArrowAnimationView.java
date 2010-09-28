@@ -14,7 +14,6 @@
  * the License.
  */
 
-
 package org.odk.collect.android.views;
 
 import android.content.Context;
@@ -26,7 +25,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
 import applab.surveys.client.R;
 
 /**
@@ -43,25 +41,21 @@ public class ArrowAnimationView extends View {
 
     private int mImgXOffset;
 
-
     public ArrowAnimationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Log.i(t, "called constructor");
         init();
     }
 
-
     public ArrowAnimationView(Context context) {
         super(context);
         init();
     }
 
-
     private void init() {
         mArrow = BitmapFactory.decodeResource(getResources(), R.drawable.left_arrow);
         mImgXOffset = mArrow.getWidth() / 2;
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -73,9 +67,8 @@ public class ArrowAnimationView extends View {
 
         int centerX = canvas.getWidth() / 2;
 
-        canvas.drawBitmap(mArrow, centerX - mImgXOffset, (float) mArrow.getHeight() / 4, null);
+        canvas.drawBitmap(mArrow, centerX - mImgXOffset, (float)mArrow.getHeight() / 4, null);
     }
-
 
     private void createAnim(Canvas canvas) {
         mAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.start_arrow);

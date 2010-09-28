@@ -16,6 +16,13 @@
 
 package org.odk.collect.android.widgets;
 
+import java.io.File;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -32,19 +39,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
 import applab.surveys.client.R;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
-
-import java.io.File;
-
 
 /**
- * Widget that allows user to take pictures, sounds or video and add them to the
- * form.
+ * Widget that allows user to take pictures, sounds or video and add them to the form.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -66,12 +64,10 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
     private int mCaptureText;
     private int mReplaceText;
 
-
     public ImageWidget(Context context, String instancePath) {
         super(context);
         initialize(instancePath);
     }
-
 
     private void initialize(String instancePath) {
         mInstanceFolder = instancePath.substring(0, instancePath.lastIndexOf("/") + 1);
@@ -82,7 +78,6 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         mReplaceText = R.string.replace_image;
     }
 
-
     private void deleteMedia() {
         // get the file path and delete the file
 
@@ -91,7 +86,7 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         // android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         // only on android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         // + a #
-        String[] projection = {Images.ImageColumns._ID};
+        String[] projection = { Images.ImageColumns._ID };
         Cursor c =
                 getContext().getContentResolver().query(mExternalUri, projection,
                         "_data='" + mInstanceFolder + mBinaryName + "'", null, null);
@@ -112,7 +107,6 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         Log.i(t, "Deleted " + del + " rows from media content provider");
     }
 
-
     public void clearAnswer() {
         // remove the file
         deleteMedia();
@@ -123,15 +117,14 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         mDisplayText.setText(getContext().getString(R.string.no_capture));
     }
 
-
     public IAnswerData getAnswer() {
         if (mBinaryName != null) {
             return new StringData(mBinaryName.toString());
-        } else {
+        }
+        else {
             return null;
         }
     }
-
 
     public void buildView(PromptElement prompt) {
         setOrientation(LinearLayout.VERTICAL);
@@ -160,12 +153,10 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
                 // FormEntyActivity will also need to be updated.
                 i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(
                         GlobalConstants.TMPFILE_PATH)));
-                ((Activity) getContext()).startActivityForResult(i, mRequestCode);
-
+                ((Activity)getContext()).startActivityForResult(i, mRequestCode);
 
             }
         });
-
 
         // retrieve answer from data model and update ui
         mDisplayText = new TextView(getContext());
@@ -175,7 +166,8 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         if (mBinaryName != null) {
             mCaptureButton.setText(getContext().getString(mReplaceText));
             mDisplayText.setText(getContext().getString(R.string.one_capture));
-        } else {
+        }
+        else {
             mDisplayText.setText(getContext().getString(R.string.no_capture));
         }
 
@@ -190,18 +182,19 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         // We're doing 500k just to be safe.
         if (testsize.length() > 500000) {
             options.inSampleSize = 8;
-        } else {
-            options = null;            
+        }
+        else {
+            options = null;
         }
 
         Bitmap bmp = BitmapFactory.decodeFile(mInstanceFolder + "/" + mBinaryName, options);
         mImageView.setImageBitmap(bmp);
-        mImageView.setPadding(10,10,10,10);
+        mImageView.setPadding(10, 10, 10, 10);
         mImageView.setAdjustViewBounds(true);
         mImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent i = new Intent("android.intent.action.VIEW");
-                String[] projection = {"_id"};
+                String[] projection = { "_id" };
                 Cursor c =
                         getContext().getContentResolver().query(mExternalUri, projection,
                                 "_data='" + mInstanceFolder + mBinaryName + "'", null, null);
@@ -212,7 +205,7 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
                     Log.e(t, "setting view path to: " + Uri.withAppendedPath(mExternalUri, id));
 
                     i.setDataAndType(Uri.withAppendedPath(mExternalUri, id), "image/*");
-                    ((Activity) getContext()).startActivity(i);
+                    ((Activity)getContext()).startActivity(i);
 
                 }
                 c.close();
@@ -220,7 +213,6 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         });
         addView(mImageView);
     }
-
 
     private String getPathFromUri(Uri uri) {
         // find entry in content provider
@@ -233,25 +225,22 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         return colString;
     }
 
-
-
     public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. delete the previous image using the
         // content provider.
         if (mBinaryName != null) {
             deleteMedia();
         }
-        String binarypath = getPathFromUri((Uri) binaryuri);
+        String binarypath = getPathFromUri((Uri)binaryuri);
         File f = new File(binarypath);
         mBinaryName = f.getName();
         Log.i(t, "Setting current answer to " + f.getName());
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

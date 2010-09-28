@@ -16,23 +16,22 @@
 
 package org.odk.collect.android.widgets;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.content.Context;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.odk.collect.android.logic.PromptElement;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 /**
- * Displays a DatePicker widget. DateWidget handles leap years and does not
- * allow dates that do not exist.
+ * Displays a DatePicker widget. DateWidget handles leap years and does not allow dates that do not exist.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -45,11 +44,9 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
     // convert from j2me date to android date
     private final static int YEARSHIFT = 1900;
 
-
     public DateWidget(Context context) {
         super(context);
     }
-
 
     /**
      * Resets date to today.
@@ -60,7 +57,6 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
                 mDateListener);
     }
 
-
     public IAnswerData getAnswer() {
         // clear focus first so the datewidget gets the value in the text box
         mDatePicker.clearFocus();
@@ -69,7 +65,6 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
                         .getDayOfMonth());
         return new DateData(d);
     }
-
 
     /**
      * Build view for date answer. Includes retrieving existing answer.
@@ -87,13 +82,15 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
             public void onDateChanged(DatePicker view, int year, int month, int day) {
                 if (prompt.isReadOnly()) {
                     if (prompt.getAnswerValue() != null) {
-                        Date d = (Date) prompt.getAnswerObject();
+                        Date d = (Date)prompt.getAnswerObject();
                         view.updateDate(d.getYear() + YEARSHIFT, d.getMonth(), d.getDate());
-                    } else {
+                    }
+                    else {
                         view.updateDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c
                                 .get(Calendar.DAY_OF_MONTH));
                     }
-                } else {
+                }
+                else {
                     // handle leap years and number of days in month
                     // TODO
                     // http://code.google.com/p/android/issues/detail?id=2081
@@ -101,7 +98,8 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
                     int max = c.getActualMaximum(Calendar.DAY_OF_MONTH);
                     if (day > max) {
                         view.updateDate(year, month, max);
-                    } else {
+                    }
+                    else {
                         view.updateDate(year, month, day);
                     }
                 }
@@ -109,9 +107,10 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
         };
 
         if (prompt.getAnswerValue() != null) {
-            Date d = (Date) prompt.getAnswerObject();
+            Date d = (Date)prompt.getAnswerObject();
             mDatePicker.init(d.getYear() + YEARSHIFT, d.getMonth(), d.getDate(), mDateListener);
-        } else {
+        }
+        else {
             // create date widget with now
             clearAnswer();
         }
@@ -120,11 +119,10 @@ public class DateWidget extends LinearLayout implements IQuestionWidget {
         addView(mDatePicker);
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

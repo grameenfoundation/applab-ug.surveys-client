@@ -16,9 +16,12 @@
 
 package org.odk.collect.android.logic;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.util.Log;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -34,18 +37,13 @@ import org.javarosa.xform.parse.XFormParser;
 import org.odk.collect.android.database.FileDbAdapter;
 import org.odk.collect.android.utilities.FileUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Vector;
-
-
+import android.content.Context;
+import android.database.Cursor;
+import android.util.Log;
 
 /**
- * Given a {@link FormDef}, enables form iteration. We intend to replace this
- * method when the next version of JavaROSA implements a form handler.
+ * Given a {@link FormDef}, enables form iteration. We intend to replace this method when the next version of JavaROSA
+ * implements a form handler.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author @author Yaw Anokwa (yanokwa@gmail.com)
@@ -57,18 +55,14 @@ public class FormHandler {
     private FormIndex mCurrentIndex;
     private int mQuestionCount;
 
-
     public FormHandler(FormDef formDef) {
         mForm = formDef;
         mCurrentIndex = FormIndex.createBeginningOfFormIndex();
     }
 
-
     /**
-     * Attempts to save the answer 'answer' into prompt. If evaluateConstraints
-     * is true then the answer won't be saved to the data model unless it passes
-     * all the constraints. If it's false, any value can be saved to the data
-     * model.
+     * Attempts to save the answer 'answer' into prompt. If evaluateConstraints is true then the answer won't be saved
+     * to the data model unless it passes all the constraints. If it's false, any value can be saved to the data model.
      * 
      * @param prompt
      * @param answer
@@ -77,14 +71,15 @@ public class FormHandler {
     public int saveAnswer(PromptElement prompt, IAnswerData answer, boolean evaluateConstraints) {
         if (!mForm.evaluateConstraint(prompt.getInstanceRef(), answer) && evaluateConstraints) {
             return GlobalConstants.ANSWER_CONSTRAINT_VIOLATED;
-        } else if (prompt.isRequired() && answer == null && evaluateConstraints) {
+        }
+        else if (prompt.isRequired() && answer == null && evaluateConstraints) {
             return GlobalConstants.ANSWER_REQUIRED_BUT_EMPTY;
-        } else {
+        }
+        else {
             mForm.setValue(answer, prompt.getInstanceRef(), prompt.getInstanceNode());
             return GlobalConstants.ANSWER_OK;
         }
     }
-
 
     /**
      * Deletes the innermost group that repeats that this node belongs to.
@@ -93,10 +88,8 @@ public class FormHandler {
         mCurrentIndex = mForm.deleteRepeat(mCurrentIndex);
     }
 
-
     /**
-     * Returns a vector of the GroupElement hierarchy to which this question
-     * belongs
+     * Returns a vector of the GroupElement hierarchy to which this question belongs
      */
     private Vector<GroupElement> getGroups() {
         Vector<Integer> mult = new Vector<Integer>();
@@ -107,14 +100,13 @@ public class FormHandler {
         for (int i = 0; i < elements.size(); i++) {
             IFormElement fi = elements.get(i);
             if (fi instanceof GroupDef) {
-                groups.add(new GroupElement(((GroupDef) fi).getLongText(), mult.get(i).intValue(),
-                        ((GroupDef) fi).getRepeat()));
+                groups.add(new GroupElement(((GroupDef)fi).getLongText(), mult.get(i).intValue(),
+                        ((GroupDef)fi).getRepeat()));
             }
         }
 
         return groups;
     }
-
 
     /**
      * Set the currentIndex to the specified FormIndex
@@ -125,12 +117,10 @@ public class FormHandler {
         mCurrentIndex = newIndex;
     }
 
-
     /**
-     * This method uses a previous question answer to determine if we need to
-     * create a set of repeats. for example, if a question asked number of
-     * children and the user entered 5, this would create 5 repeats of children
-     * (this is all specified in the xform).
+     * This method uses a previous question answer to determine if we need to create a set of repeats. for example, if a
+     * question asked number of children and the user entered 5, this would create 5 repeats of children (this is all
+     * specified in the xform).
      * 
      * @param index
      */
@@ -138,12 +128,12 @@ public class FormHandler {
         if (index.isInForm()) {
             IFormElement e = getForm().getChild(index);
             if (e instanceof GroupDef) {
-                GroupDef g = (GroupDef) e;
+                GroupDef g = (GroupDef)e;
                 if (g.getRepeat() && g.getCountReference() != null) {
                     IAnswerData count =
                             getForm().getDataModel().getDataValue(g.getCountReference());
                     if (count != null) {
-                        int fullcount = ((Integer) count.getValue()).intValue();
+                        int fullcount = ((Integer)count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);
                         TreeElement element = getForm().getDataModel().resolveReference(ref);
                         if (element == null) {
@@ -157,38 +147,34 @@ public class FormHandler {
         }
     }
 
-
     public FormIndex getIndex() {
         return mCurrentIndex;
     }
-
 
     /*
      * Skips a prompt asking "add another repeat?"
      */
     private boolean isNoAsk(FormIndex index) {
         Vector<IFormElement> defs = getIndexVector(index);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
         if (last instanceof GroupDef) {
-            GroupDef end = (GroupDef) last;
+            GroupDef end = (GroupDef)last;
             return end.noAddRemove;
         }
         return false;
     }
 
-
     /**
-     * Returns the prompt associated with the next relevant question or repeat.
-     * For filling out forms, use this rather than nextQuestionPrompt()
+     * Returns the prompt associated with the next relevant question or repeat. For filling out forms, use this rather
+     * than nextQuestionPrompt()
      * 
      */
     public PromptElement nextPrompt() {
         nextRelevantIndex();
 
         /*
-         * First see if we need to build a set of repeats. Then Check here to
-         * see if the noaskrepeat is set. If it is, then this node would
-         * normally trigger a "add repeat?" dialog, so we just skip it.
+         * First see if we need to build a set of repeats. Then Check here to see if the noaskrepeat is set. If it is,
+         * then this node would normally trigger a "add repeat?" dialog, so we just skip it.
          */
         createModelIfNecessary(mCurrentIndex);
         if (isNoAsk(mCurrentIndex)) {
@@ -198,14 +184,16 @@ public class FormHandler {
         while (!isEnd()) {
             Vector<IFormElement> defs = getIndexVector(mCurrentIndex);
             if (indexIsGroup(mCurrentIndex)) {
-                GroupDef last = (defs.size() == 0 ? null : (GroupDef) defs.lastElement());
+                GroupDef last = (defs.size() == 0 ? null : (GroupDef)defs.lastElement());
 
                 if (last != null && last.getRepeat() && resolveReferenceForCurrentIndex() == null) {
                     return new PromptElement(getGroups());
-                } else {
+                }
+                else {
                     // this group doesn't repeat, so skip passed it
                 }
-            } else {
+            }
+            else {
                 // we have a question
                 mQuestionCount++;
                 return new PromptElement(mCurrentIndex, getForm(), getGroups());
@@ -217,11 +205,9 @@ public class FormHandler {
         return new PromptElement(PromptElement.TYPE_END);
     }
 
-
     /**
-     * returns the prompt associated with the next relevant question. This
-     * should only be used when iterating through the questions as it ignores
-     * any repeats
+     * returns the prompt associated with the next relevant question. This should only be used when iterating through
+     * the questions as it ignores any repeats
      * 
      */
     public PromptElement nextQuestionPrompt() {
@@ -231,7 +217,8 @@ public class FormHandler {
             if (indexIsGroup(mCurrentIndex)) {
                 nextRelevantIndex();
                 continue;
-            } else {
+            }
+            else {
                 // we have a question
                 return new PromptElement(mCurrentIndex, getForm(), getGroups());
             }
@@ -239,7 +226,6 @@ public class FormHandler {
 
         return new PromptElement(PromptElement.TYPE_END);
     }
-
 
     /**
      * returns the PrompElement for the current index.
@@ -255,7 +241,6 @@ public class FormHandler {
             return new PromptElement(mCurrentIndex, getForm(), getGroups());
     }
 
-
     /**
      * returns the prompt for the previous relevant question
      * 
@@ -269,17 +254,14 @@ public class FormHandler {
             return new PromptElement(mCurrentIndex, getForm(), getGroups());
     }
 
-
     private void nextRelevantIndex() {
         do {
             mCurrentIndex = mForm.incrementIndex(mCurrentIndex);
         } while (mCurrentIndex.isInForm() && !isRelevant(mCurrentIndex));
     }
 
-
     /**
-     * moves index to the previous relevant index representing a question,
-     * skipping any groups
+     * moves index to the previous relevant index representing a question, skipping any groups
      */
     private void prevQuestion() {
         do {
@@ -293,17 +275,16 @@ public class FormHandler {
         }
     }
 
-
     private boolean indexIsGroup(FormIndex index) {
         Vector<IFormElement> defs = getIndexVector(index);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
         if (last instanceof GroupDef) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
-
 
     public boolean isBeginning() {
         if (mCurrentIndex.isBeginningOfFormIndex())
@@ -312,7 +293,6 @@ public class FormHandler {
             return false;
     }
 
-
     public boolean isEnd() {
         if (mCurrentIndex.isEndOfFormIndex())
             return true;
@@ -320,10 +300,8 @@ public class FormHandler {
             return false;
     }
 
-
     /**
-     * returns true if the specified FormIndex should be displayed, false
-     * otherwise
+     * returns true if the specified FormIndex should be displayed, false otherwise
      * 
      * @param questionIndex
      */
@@ -332,9 +310,9 @@ public class FormHandler {
         boolean isAskNewRepeat = false;
 
         Vector<IFormElement> defs = getIndexVector(questionIndex);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
         if (last instanceof GroupDef
-                && ((GroupDef) last).getRepeat()
+                && ((GroupDef)last).getRepeat()
                 && mForm.getDataModel().resolveReference(mForm.getChildInstanceRef(questionIndex)) == null) {
             isAskNewRepeat = true;
         }
@@ -342,7 +320,8 @@ public class FormHandler {
         boolean relevant;
         if (isAskNewRepeat) {
             relevant = mForm.canCreateRepeat(ref);
-        } else {
+        }
+        else {
             TreeElement node = mForm.getDataModel().resolveReference(ref);
             if (node == null) {
                 // you probably a bind error
@@ -354,8 +333,7 @@ public class FormHandler {
 
         if (relevant) {
             /*
-             * if instance flag/condition says relevant, we still have check the
-             * <group>/<repeat> hierarchy
+             * if instance flag/condition says relevant, we still have check the <group>/<repeat> hierarchy
              */
             FormIndex ancestorIndex = null;
             FormIndex cur = null;
@@ -365,7 +343,8 @@ public class FormHandler {
                 if (ancestorIndex == null) {
                     ancestorIndex = next;
                     cur = next;
-                } else {
+                }
+                else {
                     cur.setNextLevel(next);
                     cur = next;
                 }
@@ -384,11 +363,9 @@ public class FormHandler {
         return relevant;
     }
 
-
     public void newRepeat() {
         mForm.createNewRepeat(mCurrentIndex);
     }
-
 
     public String getCurrentLanguage() {
         if (mForm.getLocalizer() != null) {
@@ -397,7 +374,6 @@ public class FormHandler {
         return null;
     }
 
-
     public String[] getLanguages() {
         if (mForm.getLocalizer() != null) {
             return mForm.getLocalizer().getAvailableLocales();
@@ -405,39 +381,32 @@ public class FormHandler {
         return null;
     }
 
-
     public void setLanguage(String language) {
         if (mForm.getLocalizer() != null) {
             mForm.getLocalizer().setLocale(language);
         }
     }
 
-
     @SuppressWarnings("unchecked")
     public Vector<IFormElement> getIndexVector(FormIndex index) {
         return mForm.explodeIndex(index);
     }
 
-
     public FormDef getForm() {
         return mForm;
     }
-
 
     private TreeElement resolveReferenceForCurrentIndex() {
         return mForm.getDataModel().resolveReference(mForm.getChildInstanceRef(mCurrentIndex));
     }
 
-
     public float getQuestionProgress() {
-        return (float) mQuestionCount / getQuestionCount();
+        return (float)mQuestionCount / getQuestionCount();
     }
-
 
     public int getQuestionNumber() {
         return mQuestionCount;
     }
-
 
     // TODO: These two methods are really hacky and completely inefficient. We
     // should figure out a way to keep
@@ -449,7 +418,6 @@ public class FormHandler {
         } while (i.isInForm() && !isRelevant(i));
         return i;
     }
-
 
     public int getQuestionCount() {
         int count = 0;
@@ -469,19 +437,16 @@ public class FormHandler {
         return count + 1;
     }
 
-
     public String getFormTitle() {
         return mForm.getTitle();
     }
 
-    
     public void preProcessForm(boolean newInstance) {
 
         mForm.initialize(newInstance);
 
     }
 
-    
     /**
      * Runs post processing handlers. Necessary to get end time.
      */
@@ -490,7 +455,6 @@ public class FormHandler {
         mForm.postProcessModel();
 
     }
-
 
     /**
      * Given a file, import the data from that file into the current form.
@@ -508,7 +472,8 @@ public class FormHandler {
         if (!savedRoot.getName().equals(templateRoot.getName()) || savedRoot.getMult() != 0) {
             Log.e(t, "Saved form instance does not match template form definition");
             return false;
-        } else {
+        }
+        else {
             // populate the data model
             TreeReference tr = TreeReference.rootRef();
             tr.add(templateRoot.getName(), TreeReference.INDEX_UNBOUND);
@@ -517,11 +482,11 @@ public class FormHandler {
             // populated model to current form
             // mForm.setDataModel(new DataModelTree(templateRoot));
             mForm.getDataModel().setRoot(templateRoot);
-            
+
             // fix any language issues
             // TODO: http://bitbucket.org/javarosa/main/issue/5/itext-n-appearing-in-restored-instances
             if (getLanguages() != null) {
-                mForm.localeChanged(getCurrentLanguage(), mForm.getLocalizer());                
+                mForm.localeChanged(getCurrentLanguage(), mForm.getLocalizer());
             }
 
             return true;
@@ -529,16 +494,14 @@ public class FormHandler {
         }
     }
 
-
     /**
-     * Loop through the data model and writes the XML file into the answer
-     * folder.
+     * Loop through the data model and writes the XML file into the answer folder.
      */
     private boolean exportXmlFile(ByteArrayPayload payload, String path) {
 
         // create data stream
         InputStream is = payload.getPayloadStream();
-        int len = (int) payload.getLength();
+        int len = (int)payload.getLength();
 
         // read from data stream
         byte[] data = new byte[len];
@@ -555,13 +518,15 @@ public class FormHandler {
                     bw.close();
                     return true;
 
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     Log.e(t, "Error writing XML file");
                     e.printStackTrace();
                     return false;
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             Log.e(t, "Error reading from payload data stream");
             e.printStackTrace();
             return false;
@@ -570,8 +535,6 @@ public class FormHandler {
         return false;
 
     }
-
-
 
     /**
      * Serialize data model and extract payload. Exports both binaries and xml.
@@ -584,12 +547,13 @@ public class FormHandler {
             // assume no binary data inside the model.
             DataModelTree datamodel = mForm.getDataModel();
             XFormSerializingVisitor serializer = new XFormSerializingVisitor();
-            payload = (ByteArrayPayload) serializer.createSerializedPayload(datamodel);
+            payload = (ByteArrayPayload)serializer.createSerializedPayload(datamodel);
 
             // write out xml
             exportXmlFile(payload, instancePath);
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             Log.e(t, "Error creating serialized payload");
             e.printStackTrace();
             return false;
@@ -603,15 +567,18 @@ public class FormHandler {
             if (c != null && c.getCount() == 0) {
                 fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
                         FileDbAdapter.STATUS_INCOMPLETE);
-            } else {
+            }
+            else {
                 fda.updateFile(instancePath, FileDbAdapter.STATUS_INCOMPLETE);
             }
-        } else {
+        }
+        else {
             if (c != null && c.getCount() == 0) {
                 fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
                         FileDbAdapter.STATUS_COMPLETE);
 
-            } else {
+            }
+            else {
                 fda.updateFile(instancePath, FileDbAdapter.STATUS_COMPLETE);
             }
         }
@@ -623,8 +590,6 @@ public class FormHandler {
         fda.close();
         return true;
 
-
     }
-
 
 }

@@ -18,12 +18,11 @@ package org.odk.collect.android.listeners;
 
 import java.util.ArrayList;
 
-
-
 /**
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public interface FormDownloaderListener {
     void downloadingComplete(ArrayList<String> result);
+
     void progressUpdate(int progress, int total);
 }

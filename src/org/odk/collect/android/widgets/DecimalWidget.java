@@ -16,19 +16,19 @@
 
 package org.odk.collect.android.widgets;
 
-import android.content.Context;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.method.DigitsKeyListener;
-import android.util.AttributeSet;
-import android.util.TypedValue;
+import java.text.NumberFormat;
 
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;
 
-import java.text.NumberFormat;
+import android.content.Context;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.method.DigitsKeyListener;
+import android.util.AttributeSet;
+import android.util.TypedValue;
 
 /**
  * A widget that restricts values to floating point numbers.
@@ -41,11 +41,9 @@ public class DecimalWidget extends StringWidget implements IQuestionWidget {
         super(context);
     }
 
-
     public DecimalWidget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
 
     @Override
     public void buildView(PromptElement prompt) {
@@ -67,7 +65,7 @@ public class DecimalWidget extends StringWidget implements IQuestionWidget {
         setFilters(fa);
 
         // in case xforms calcuate returns a double, convert to integer
-        Double d = (Double) prompt.getAnswerObject();
+        Double d = (Double)prompt.getAnswerObject();
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setMaximumFractionDigits(15);
         nf.setMaximumIntegerDigits(15);
@@ -84,16 +82,17 @@ public class DecimalWidget extends StringWidget implements IQuestionWidget {
         }
     }
 
-
     @Override
     public IAnswerData getAnswer() {
         String s = getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        } else {
+        }
+        else {
             try {
                 return new DecimalData(Double.valueOf(s).doubleValue());
-            } catch (Exception NumberFormatException) {
+            }
+            catch (Exception NumberFormatException) {
                 return null;
             }
         }

@@ -16,14 +16,14 @@
 
 package org.odk.collect.android.widgets;
 
-import android.content.Context;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.odk.collect.android.logic.PromptElement;
 
+import android.content.Context;
+
 /**
- * QuestionWidgets are the main elements in QuestionView. QuestionView is a
- * ScrollView, so widget designers don't need to worry about scrolling.
+ * QuestionWidgets are the main elements in QuestionView. QuestionView is a ScrollView, so widget designers don't need
+ * to worry about scrolling.
  * 
  * Each widget does need to handle the 'ReadOnly' case in BuildView().
  * 
@@ -31,7 +31,10 @@ import org.odk.collect.android.logic.PromptElement;
  */
 public interface IQuestionWidget {
     public IAnswerData getAnswer();
+
     public void clearAnswer();
+
     public void buildView(PromptElement prompt);
+
     public void setFocus(Context context);
 }

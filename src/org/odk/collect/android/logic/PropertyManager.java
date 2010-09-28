@@ -16,15 +16,15 @@
 
 package org.odk.collect.android.logic;
 
-import android.content.Context;
-import android.telephony.TelephonyManager;
-import android.util.Log;
+import java.util.HashMap;
+import java.util.Vector;
 
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
-import java.util.HashMap;
-import java.util.Vector;
+import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 
 /**
  * Used to return device properties to JavaRosa
@@ -47,11 +47,9 @@ public class PropertyManager implements IPropertyManager {
     private final static String SIM_SERIAL_PROPERTY = "simserial";
     private final static String PHONE_NUMBER_PROPERTY = "phonenumber";
 
-
     public String getName() {
         return "Property Manager";
     }
-
 
     public PropertyManager(Context context) {
         Log.i(t, "calling constructor");
@@ -59,7 +57,7 @@ public class PropertyManager implements IPropertyManager {
         mContext = context;
 
         mProperties = new HashMap<String, String>();
-        mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
 
         mProperties.put(DEVICE_ID_PROPERTY, mTelephonyManager.getDeviceId());
         mProperties.put(SUBSCRIBER_ID_PROPERTY, mTelephonyManager.getSubscriberId());
@@ -67,32 +65,26 @@ public class PropertyManager implements IPropertyManager {
         mProperties.put(PHONE_NUMBER_PROPERTY, mTelephonyManager.getLine1Number());
     }
 
-
     @SuppressWarnings("unchecked")
     public Vector getProperty(String propertyName) {
         return null;
     }
 
-
     public String getSingularProperty(String propertyName) {
         return mProperties.get(propertyName.toLowerCase());
     }
 
-
     public void setProperty(String propertyName, String propertyValue) {
     }
-
 
     @SuppressWarnings("unchecked")
     public void setProperty(String propertyName, Vector propertyValue) {
 
     }
 
-
     public void addRules(IPropertyRules rules) {
 
     }
-
 
     @SuppressWarnings("unchecked")
     public Vector getRules() {

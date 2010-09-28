@@ -16,7 +16,6 @@
 
 package org.odk.collect.android.utilities;
 
-
 /**
  * Calculates the direction of a gesture/fling. Used by {@link GestureDetector}
  * 
@@ -36,7 +35,6 @@ public class GestureDirection {
     private float mEndX;
     private float mEndY;
 
-
     public GestureDirection(float x, float y) {
         mStartX = x;
         mStartY = y;
@@ -44,22 +42,18 @@ public class GestureDirection {
         mEndY = y;
     }
 
-
     public void updateEndPoint(float x, float y) {
         mEndX = x;
         mEndY = y;
     }
 
-
     public float getStartX() {
         return mStartX;
     }
 
-
     public float getStartY() {
         return mStartY;
     }
-
 
     public UserGesture getDirection() {
         float dx = mEndX - mStartX;

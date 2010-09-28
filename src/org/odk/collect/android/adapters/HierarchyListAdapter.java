@@ -16,11 +16,11 @@
 
 package org.odk.collect.android.adapters;
 
-import org.odk.collect.android.logic.HierarchyElement;
-import org.odk.collect.android.views.HierarchyElementView;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.odk.collect.android.logic.HierarchyElement;
+import org.odk.collect.android.views.HierarchyElementView;
 
 import android.content.Context;
 import android.view.View;
@@ -32,11 +32,9 @@ public class HierarchyListAdapter extends BaseAdapter {
     private Context mContext;
     private List<HierarchyElement> mItems = new ArrayList<HierarchyElement>();
 
-
     public HierarchyListAdapter(Context context) {
         mContext = context;
     }
-
 
     /*
      * (non-Javadoc)
@@ -47,7 +45,6 @@ public class HierarchyListAdapter extends BaseAdapter {
         return mItems.size();
     }
 
-
     /*
      * (non-Javadoc)
      * 
@@ -56,7 +53,6 @@ public class HierarchyListAdapter extends BaseAdapter {
     public Object getItem(int position) {
         return mItems.get(position);
     }
-
 
     /*
      * (non-Javadoc)
@@ -67,19 +63,18 @@ public class HierarchyListAdapter extends BaseAdapter {
         return position;
     }
 
-
     /*
      * (non-Javadoc)
      * 
-     * @see android.widget.Adapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
+     * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
      */
     public View getView(int position, View convertView, ViewGroup parent) {
         HierarchyElementView hev;
         if (convertView == null) {
             hev = new HierarchyElementView(mContext, mItems.get(position));
-        } else {
-            hev = (HierarchyElementView) convertView;
+        }
+        else {
+            hev = (HierarchyElementView)convertView;
             hev.setPrimaryText(mItems.get(position).getPrimaryText());
             hev.setSecondaryText(mItems.get(position).getSecondaryText());
             hev.setIcon(mItems.get(position).getIcon());
@@ -88,7 +83,6 @@ public class HierarchyListAdapter extends BaseAdapter {
         return hev;
 
     }
-
 
     /**
      * Sets the list of items for this adapter to use.

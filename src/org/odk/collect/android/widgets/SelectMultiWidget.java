@@ -16,12 +16,8 @@
 
 package org.odk.collect.android.widgets;
 
-import android.content.Context;
-import android.util.TypedValue;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
@@ -30,8 +26,12 @@ import org.javarosa.core.util.OrderedHashtable;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.logic.PromptElement;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import android.content.Context;
+import android.util.TypedValue;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 
 /**
  * SelctMultiWidget handles multiple selection fields using checkboxes.
@@ -45,24 +45,21 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
     private boolean mCheckboxInit = true;
     OrderedHashtable mItems;
 
-
     public SelectMultiWidget(Context context) {
         super(context);
     }
-
 
     public void clearAnswer() {
         int j = mItems.size();
         for (int i = 0; i < j; i++) {
 
             // no checkbox group so find by id + offset
-            CheckBox c = ((CheckBox) findViewById(CHECKBOX_ID + i));
+            CheckBox c = ((CheckBox)findViewById(CHECKBOX_ID + i));
             if (c.isChecked()) {
                 c.setChecked(false);
             }
         }
     }
-
 
     @SuppressWarnings("unchecked")
     public IAnswerData getAnswer() {
@@ -74,9 +71,9 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
         // counter for offset
         int i = 0;
         while (en.hasMoreElements()) {
-            k = (String) en.nextElement();
-            v = (String) mItems.get(k);
-            CheckBox c = ((CheckBox) findViewById(CHECKBOX_ID + i));
+            k = (String)en.nextElement();
+            v = (String)mItems.get(k);
+            CheckBox c = ((CheckBox)findViewById(CHECKBOX_ID + i));
             if (c.isChecked()) {
                 ve.add(new Selection(v));
             }
@@ -85,11 +82,11 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
 
         if (ve.size() == 0) {
             return null;
-        } else {
+        }
+        else {
             return new SelectMultiData(ve);
         }
     }
-
 
     @SuppressWarnings("unchecked")
     public void buildView(final PromptElement prompt) {
@@ -99,7 +96,7 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
 
         Vector ve = new Vector();
         if (prompt.getAnswerValue() != null) {
-            ve = (Vector) prompt.getAnswerObject();
+            ve = (Vector)prompt.getAnswerObject();
         }
 
         if (prompt.getSelectItems() != null) {
@@ -113,8 +110,8 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
 
             while (en.hasMoreElements()) {
 
-                k = (String) en.nextElement();
-                v = (String) h.get(k);
+                k = (String)en.nextElement();
+                v = (String)h.get(k);
 
                 // no checkbox group so id by answer + offset
                 CheckBox c = new CheckBox(getContext());
@@ -125,7 +122,8 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
                         if (!mCheckboxInit && prompt.isReadOnly()) {
                             if (buttonView.isChecked()) {
                                 buttonView.setChecked(false);
-                            } else {
+                            }
+                            else {
                                 buttonView.setChecked(true);
                             }
                         }
@@ -138,7 +136,7 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
 
                 for (int vi = 0; vi < ve.size(); vi++) {
                     // match based on value, not key
-                    if (v.equals(((Selection) ve.elementAt(vi)).getValue())) {
+                    if (v.equals(((Selection)ve.elementAt(vi)).getValue())) {
                         c.setChecked(true);
                         break;
                     }
@@ -154,11 +152,10 @@ public class SelectMultiWidget extends LinearLayout implements IQuestionWidget {
         mCheckboxInit = false;
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

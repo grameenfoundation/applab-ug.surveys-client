@@ -16,9 +16,6 @@
 
 package org.odk.collect.android.utilities;
 
-import android.os.Environment;
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +26,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import android.os.Environment;
+import android.util.Log;
+
 /**
  * Static methods used for common file operations.
  * 
@@ -37,7 +37,6 @@ import java.util.ArrayList;
  */
 public class FileUtils {
     private final static String t = "FileUtils";
-
 
     public static ArrayList<String> getFoldersAsArrayList(String path) {
         ArrayList<String> mFolderList = new ArrayList<String>();
@@ -64,7 +63,6 @@ public class FileUtils {
         return mFolderList;
     }
 
-
     public static ArrayList<String> getFilesAsArrayList(String path) {
         ArrayList<String> mFileList = new ArrayList<String>();
         File root = new File(path);
@@ -86,7 +84,8 @@ public class FileUtils {
                     mFileList.add(child.getAbsolutePath());
                 }
             }
-        } else {
+        }
+        else {
             String filename = root.getName();
             // no hidden files
             if (!filename.startsWith(".")) {
@@ -96,14 +95,12 @@ public class FileUtils {
         return mFileList;
     }
 
-
     public static ArrayList<String> getFilesAsArrayListRecursive(String path) {
         ArrayList<String> mFileList = new ArrayList<String>();
         File root = new File(path);
         getFilesAsArrayListRecursiveHelper(root, mFileList);
         return mFileList;
     }
-
 
     private static void getFilesAsArrayListRecursiveHelper(File f, ArrayList<String> filelist) {
         if (f.isDirectory()) {
@@ -115,7 +112,6 @@ public class FileUtils {
         }
         filelist.add(f.getAbsolutePath());
     }
-
 
     public static boolean deleteFolder(String path) {
         // not recursive
@@ -130,11 +126,11 @@ public class FileUtils {
                 }
             }
             return dir.delete();
-        } else {
+        }
+        else {
             return false;
         }
     }
-
 
     public static boolean createFolder(String path) {
         if (storageReady()) {
@@ -144,21 +140,21 @@ public class FileUtils {
                 made = dir.mkdirs();
             }
             return made;
-        } else {
+        }
+        else {
             return false;
         }
     }
-
 
     public static boolean deleteFile(String path) {
         if (storageReady()) {
             File f = new File(path);
             return f.delete();
-        } else {
+        }
+        else {
             return false;
         }
     }
-
 
     public static byte[] getFileAsBytes(File file) {
         byte[] bytes = null;
@@ -174,7 +170,7 @@ public class FileUtils {
             }
 
             // Create the byte array to hold the data
-            bytes = new byte[(int) length];
+            bytes = new byte[(int)length];
 
             // Read in the bytes
             int offset = 0;
@@ -184,7 +180,8 @@ public class FileUtils {
                     read = is.read(bytes, offset, bytes.length - offset);
                     offset += read;
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 Log.e(t, "Cannot read " + file.getName());
                 e.printStackTrace();
                 return null;
@@ -194,7 +191,8 @@ public class FileUtils {
             if (offset < bytes.length) {
                 try {
                     throw new IOException("Could not completely read file " + file.getName());
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                     return null;
                 }
@@ -202,23 +200,25 @@ public class FileUtils {
 
             return bytes;
 
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             Log.e(t, "Cannot find " + file.getName());
             e.printStackTrace();
             return null;
 
-        } finally {
+        }
+        finally {
             // Close the input stream
             try {
                 is.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 Log.e(t, "Cannot close input stream for " + file.getName());
                 e.printStackTrace();
                 return null;
             }
         }
     }
-
 
     private static boolean storageReady() {
         String cardstatus = Environment.getExternalStorageState();
@@ -227,11 +227,11 @@ public class FileUtils {
                 || cardstatus.equals(Environment.MEDIA_UNMOUNTED)
                 || cardstatus.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
             return false;
-        } else {
+        }
+        else {
             return true;
         }
     }
-
 
     public static String getMd5Hash(File file) {
         try {
@@ -243,13 +243,12 @@ public class FileUtils {
                 md5 = "0" + md5;
             return md5;
 
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e) {
             Log.e("MD5", e.getMessage());
             return null;
 
         }
     }
-
-
 
 }

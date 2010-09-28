@@ -16,6 +16,11 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -24,13 +29,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
 import applab.surveys.client.R;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
-
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.
@@ -45,27 +44,24 @@ public class TriggerWidget extends LinearLayout implements IQuestionWidget {
     private String yes = "yes";
     private String no = "no";
 
-
     public TriggerWidget(Context context) {
         super(context);
     }
-
 
     public void clearAnswer() {
         mStringAnswer.setText(null);
         mActionButton.setChecked(false);
     }
 
-
     public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        } else {
+        }
+        else {
             return new StringData(s);
         }
     }
-
 
     public void buildView(PromptElement prompt) {
         this.setOrientation(LinearLayout.VERTICAL);
@@ -82,7 +78,8 @@ public class TriggerWidget extends LinearLayout implements IQuestionWidget {
             public void onClick(View v) {
                 if (TriggerWidget.this.mActionButton.isChecked()) {
                     TriggerWidget.this.mStringAnswer.setText(yes);
-                } else {
+                }
+                else {
                     TriggerWidget.this.mStringAnswer.setText(no);
                 }
             }
@@ -99,7 +96,8 @@ public class TriggerWidget extends LinearLayout implements IQuestionWidget {
         if (s != null) {
             if (s.equals(yes)) {
                 mActionButton.setChecked(true);
-            } else {
+            }
+            else {
                 mActionButton.setChecked(false);
             }
             mStringAnswer.setText(s);
@@ -111,11 +109,10 @@ public class TriggerWidget extends LinearLayout implements IQuestionWidget {
         // this.addView(mStringAnswer);
     }
 
-
     public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 }

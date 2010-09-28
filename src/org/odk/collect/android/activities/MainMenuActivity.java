@@ -16,28 +16,41 @@
 
 package org.odk.collect.android.activities;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import applab.surveys.client.R;
 import org.odk.collect.android.database.FileDbAdapter;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.preferences.ServerPreferences;
 import org.odk.collect.android.utilities.FileUtils;
 
-import java.util.ArrayList;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.InputFilter;
+import android.text.Spanned;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import applab.client.BrowserActivity;
+import applab.client.BrowserResultDialog;
+import applab.client.Handset;
+import applab.surveys.client.R;
 
 /**
- * Responsible for displaying buttons to launch the major activities. Launches
- * some activities based on returns of others.
+ * Responsible for displaying buttons to launch the major activities. Launches some activities based on returns of
+ * others.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -48,6 +61,8 @@ public class MainMenuActivity extends Activity {
     private static final int FORM_CHOOSER = 0;
     private static final int INSTANCE_CHOOSER_TABS = 1;
     private static final int INSTANCE_UPLOADER = 2;
+    private static final int REGISTRATION_CODE = 3;
+    private static final int FORGOT_ID_CODE = 4;
 
     // menu options
     private static final int MENU_PREFERENCES = Menu.FIRST;
@@ -57,6 +72,10 @@ public class MainMenuActivity extends Activity {
     private Button mManageFilesButton;
     private Button mSendDataButton;
     private Button mReviewDataButton;
+    private Button registerFarmerButton;
+    private Button forgotIdButton;
+
+    private EditText farmerNameEditBox;
 
     // counts for buttons
     private static int mSavedCount;
@@ -64,46 +83,65 @@ public class MainMenuActivity extends Activity {
     private static int mAvailableCount;
     private static int mFormsCount;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_RIGHT_ICON);
         setContentView(R.layout.main_menu);
+        setFeatureDrawableResource(Window.FEATURE_RIGHT_ICON, R.drawable.notes);
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.main_menu));
 
+        this.farmerNameEditBox = (EditText)findViewById(R.id.id_field);
+        this.farmerNameEditBox.setFilters(new InputFilter[] { getFarmerInputFilter() });
         // enter data button. expects a result.
-        mEnterDataButton = (Button) findViewById(R.id.enter_data);
+        mEnterDataButton = (Button)findViewById(R.id.enter_data);
         mEnterDataButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                // make sure we haven't added forms
-                ArrayList<String> forms = FileUtils.getFilesAsArrayList(GlobalConstants.FORMS_PATH);
-                if (forms != null) {
-                    mFormsCount = forms.size();
-                } else {
-                    mFormsCount = 0;
+                String farmerName = farmerNameEditBox.getText().toString().trim();
+                if (farmerName.length() > 0) {
+                    if (checkID(farmerName)) {
+                        GlobalConstants.intervieweeName = farmerName;
+                        tryOpenFormChooser();
+                    }
+                    else {
+                        showTestSurveyDialog();
+                    }
                 }
-
-                if (mFormsCount == 0 && mAvailableCount == 0) {
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.no_items_error, getString(R.string.enter)),
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    Intent i = new Intent(getApplicationContext(), FormChooserList.class);
-                    startActivityForResult(i, FORM_CHOOSER);
+                else {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Farmer\'s ID cannot be empty", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
+            }
+        });
 
+        registerFarmerButton = (Button)findViewById(R.id.register_farmer_button);
+        registerFarmerButton.setText("Register New Farmer");
+        registerFarmerButton.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                onRequestBrowserIntentButtonClick("getFarmerRegistrationForm", REGISTRATION_CODE);
+            }
+        });
+
+        forgotIdButton = (Button)findViewById(R.id.forgot_id_button);
+        forgotIdButton.setText("Forgot Farmer's ID");
+        forgotIdButton.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                onRequestBrowserIntentButtonClick("findFarmerId", FORGOT_ID_CODE);
             }
         });
 
         // review data button. expects a result.
-        mReviewDataButton = (Button) findViewById(R.id.review_data);
+        mReviewDataButton = (Button)findViewById(R.id.review_data);
         mReviewDataButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if ((mSavedCount + mCompletedCount) == 0) {
                     Toast.makeText(getApplicationContext(),
                             getString(R.string.no_items_error, getString(R.string.review)),
                             Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                else {
                     Intent i = new Intent(getApplicationContext(), InstanceChooserTabs.class);
                     startActivityForResult(i, INSTANCE_CHOOSER_TABS);
                 }
@@ -112,14 +150,15 @@ public class MainMenuActivity extends Activity {
         });
 
         // send data button. expects a result.
-        mSendDataButton = (Button) findViewById(R.id.send_data);
+        mSendDataButton = (Button)findViewById(R.id.send_data);
         mSendDataButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (mCompletedCount == 0) {
                     Toast.makeText(getApplicationContext(),
                             getString(R.string.no_items_error, getString(R.string.send)),
                             Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                else {
                     Intent i = new Intent(getApplicationContext(), InstanceUploaderList.class);
                     startActivityForResult(i, INSTANCE_UPLOADER);
                 }
@@ -128,7 +167,7 @@ public class MainMenuActivity extends Activity {
         });
 
         // manage forms button. no result expected.
-        mManageFilesButton = (Button) findViewById(R.id.manage_forms);
+        mManageFilesButton = (Button)findViewById(R.id.manage_forms);
         mManageFilesButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), FileManagerTabs.class);
@@ -137,6 +176,121 @@ public class MainMenuActivity extends Activity {
         });
     }
 
+    private void tryOpenFormChooser() {
+        // make sure we haven't added forms
+        ArrayList<String> forms = FileUtils.getFilesAsArrayList(GlobalConstants.FORMS_PATH);
+        if (forms != null) {
+            mFormsCount = forms.size();
+        }
+        else {
+            mFormsCount = 0;
+        }
+
+        if (mFormsCount == 0 && mAvailableCount == 0) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.no_items_error, getString(R.string.enter)),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Intent i = new Intent(getApplicationContext(), FormChooserList.class);
+            startActivityForResult(i, FORM_CHOOSER);
+        }
+    }
+
+    /**
+     * Common code for handling button clicks that start a browser activity for a result.
+     * 
+     * @param urlPattern
+     *            The @BrowserActivity.EXTRA_URL_INTENT related url pattern
+     * @param requestCode
+     *            Code identifying the button that invoked the browser call. This so that the result is handled
+     *            accordingly in the parent activity.
+     */
+    private void onRequestBrowserIntentButtonClick(String urlPattern, int requestCode) {
+        String farmerName = farmerNameEditBox.getText().toString().trim();
+        if (farmerName.length() > 0 || urlPattern.contentEquals("findFarmerId")) {
+            if (urlPattern.contentEquals("findFarmerId") || checkID(farmerName)) {
+                // Set the farmer ID
+                GlobalConstants.intervieweeName = farmerName;
+                Intent webActivity = new Intent(getApplicationContext(), BrowserActivity.class);
+
+                SharedPreferences settings =
+                        PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                String serverUrl = settings.getString(ServerPreferences.KEY_SERVER, getString(R.string.default_server));
+                // Temporary edit for base url to use services instead of zebra
+                serverUrl = serverUrl.substring(0, serverUrl.length()
+                        - 5);
+                webActivity.putExtra(BrowserActivity.EXTRA_URL_INTENT,
+                        serverUrl + "services/" + urlPattern + "?handsetId=" + Handset.getImei(this) + "&farmerId="
+                                + farmerName);
+                startActivityForResult(webActivity, requestCode);
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), "Invalid Farmer ID.", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+        else {
+            Toast toast = Toast.makeText(getApplicationContext(), "Farmer\'s ID cannot be empty", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    private boolean checkID(String text) {
+        Pattern pattern = Pattern.compile("[a-zA-Z]{2}[0-9]{4,5}+");
+        Matcher matcher = pattern.matcher(text);
+        return matcher.matches();
+    }
+
+    void showTestSurveyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.help);
+        builder.setTitle("Perform Test Survey?");
+        builder.setMessage("The ID you entered is not valid, "
+                + "it should be 2 letters followed by at least 4 numbers."
+                + "\nWould you like to do a test survey instead?"
+                + " NOTE: You will NOT be compensated for doing a test survey.")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        GlobalConstants.intervieweeName = "TEST";
+                        tryOpenFormChooser();
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Return an InputFilter that can validate farmer id characters entered in the UI
+     */
+    public InputFilter getFarmerInputFilter() {
+        return new InputFilter() {
+            public CharSequence filter(CharSequence source, int start, int end,
+                                       Spanned destination, int destinationStart, int destinationEnd) {
+                for (int characterIndex = start; characterIndex < end; characterIndex++) {
+                    char currentCharacter = source.charAt(characterIndex);
+                    if (Character.isLetterOrDigit(currentCharacter)) {
+                        continue;
+                    }
+
+                    if (Character.isWhitespace(currentCharacter)) {
+                        continue;
+                    }
+                    Toast toast = Toast.makeText(getApplicationContext(), "Invalid Character", Toast.LENGTH_SHORT);
+                    toast.show();
+                    return "";
+                }
+                return null;
+            }
+        };
+    }
 
     /*
      * (non-Javadoc)
@@ -149,14 +303,12 @@ public class MainMenuActivity extends Activity {
         refreshView();
     }
 
-
-
     /**
      * Upon return, check intent for data needed to launch other activities.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (resultCode == RESULT_CANCELED) {
+        if (resultCode == RESULT_CANCELED && requestCode < REGISTRATION_CODE) {
             return;
         }
 
@@ -181,10 +333,43 @@ public class MainMenuActivity extends Activity {
                 break;
             default:
                 break;
+            case REGISTRATION_CODE:
+                if (resultCode == RESULT_OK) {
+                    BrowserResultDialog.show(this, "Registration successful.", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            tryOpenFormChooser();
+                            dialog.cancel();
+                        }
+                    });
+                }
+                else if (resultCode == RESULT_CANCELED) {
+                    // reset the Farmer ID
+                    GlobalConstants.intervieweeName = "";
+                    // Show error dialog
+                    BrowserResultDialog.show(this, "Unable to register farmer. \nCheck the ID or try again later.");
+                }
+                break;
+            case FORGOT_ID_CODE:
+                if (resultCode == RESULT_OK) {
+                    if (intent != null) {
+                        String farmerId = intent.getDataString();
+                        BrowserResultDialog.show(this, "Selected ID: " + farmerId, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                tryOpenFormChooser();
+                                dialog.cancel();
+                            }
+                        });
+                    }
+                }
+                else if (resultCode == RESULT_CANCELED) {
+                    // reset the Farmer ID
+                    GlobalConstants.intervieweeName = "";
+                    BrowserResultDialog.show(this, "Unable to find ID. Try again later.");
+                }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, intent);
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -195,11 +380,9 @@ public class MainMenuActivity extends Activity {
         fda.close();
     }
 
-
     private void refreshView() {
         updateButtonCount();
     }
-
 
     /**
      * Updates the button count and sets the text in the buttons.
@@ -224,7 +407,8 @@ public class MainMenuActivity extends Activity {
         ArrayList<String> forms = FileUtils.getFilesAsArrayList(GlobalConstants.FORMS_PATH);
         if (forms != null) {
             mFormsCount = forms.size();
-        } else {
+        }
+        else {
             mFormsCount = 0;
         }
 
@@ -237,7 +421,8 @@ public class MainMenuActivity extends Activity {
         // update button text
         if (mAvailableCount == mFormsCount) {
             mEnterDataButton.setText(getString(R.string.enter_data_button, mAvailableCount));
-        } else {
+        }
+        else {
             mEnterDataButton.setText(getString(R.string.enter_data));
         }
 
@@ -247,12 +432,10 @@ public class MainMenuActivity extends Activity {
                 + mCompletedCount));
     }
 
-
     private void createPreferencesMenu() {
         Intent i = new Intent(this, ServerPreferences.class);
         startActivity(i);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -261,7 +444,6 @@ public class MainMenuActivity extends Activity {
                 android.R.drawable.ic_menu_preferences);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -272,6 +454,5 @@ public class MainMenuActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 }

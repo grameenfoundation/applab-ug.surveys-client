@@ -16,6 +16,13 @@
 
 package org.odk.collect.android.views;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.odk.collect.android.logic.GroupElement;
+import org.odk.collect.android.logic.PromptElement;
+import org.odk.collect.android.widgets.IBinaryWidget;
+import org.odk.collect.android.widgets.IQuestionWidget;
+import org.odk.collect.android.widgets.WidgetFactory;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -26,18 +33,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.odk.collect.android.logic.GroupElement;
-import org.odk.collect.android.logic.PromptElement;
-import org.odk.collect.android.widgets.IBinaryWidget;
-import org.odk.collect.android.widgets.IQuestionWidget;
-import org.odk.collect.android.widgets.WidgetFactory;
-
-
 /**
- * Responsible for using a {@link PromptElement} and based on the question type
- * and answer type, displaying the appropriate widget. The class also sets (but
- * does not save) and gets the answers to questions.
+ * Responsible for using a {@link PromptElement} and based on the question type and answer type, displaying the
+ * appropriate widget. The class also sets (but does not save) and gets the answers to questions.
  * 
  * @author Yaw Anokwa (yanokwa@gmail.com)
  * @author Carl Hartung (carlhartung@gmail.com)
@@ -52,19 +50,16 @@ public class QuestionView extends ScrollView {
     private String mInstancePath;
     private final static int TEXTSIZE = 21;
 
-
     public QuestionView(Context context, PromptElement prompt, String instancePath) {
         super(context);
 
         this.mInstancePath = instancePath;
     }
 
-
     /**
      * Create the appropriate view given your prompt.
      */
     public void buildView(PromptElement p) {
-
 
         mView = new LinearLayout(getContext());
         mView.setOrientation(LinearLayout.VERTICAL);
@@ -84,32 +79,27 @@ public class QuestionView extends ScrollView {
         // if question or answer type is not supported, use text widget
         mQuestionWidget = WidgetFactory.createWidgetFromPrompt(p, getContext(), mInstancePath);
 
-        mView.addView((View) mQuestionWidget, mLayout);
+        mView.addView((View)mQuestionWidget, mLayout);
         addView(mView);
     }
-
 
     public IAnswerData getAnswer() {
         return mQuestionWidget.getAnswer();
     }
 
-
     public void setBinaryData(Object answer) {
         if (mQuestionWidget instanceof IBinaryWidget)
-            ((IBinaryWidget) mQuestionWidget).setBinaryData(answer);
+            ((IBinaryWidget)mQuestionWidget).setBinaryData(answer);
         else
             Log.e(t, "Attempted to setBinaryData() on a non-binary widget ");
     }
-
 
     public void clearAnswer() {
         mQuestionWidget.clearAnswer();
     }
 
-
     /**
-     * Add a TextView containing the hierarchy of groups to which the question
-     * belongs.
+     * Add a TextView containing the hierarchy of groups to which the question belongs.
      */
     private void AddGroupText(PromptElement p) {
         StringBuffer s = new StringBuffer("");
@@ -139,7 +129,6 @@ public class QuestionView extends ScrollView {
         }
     }
 
-
     /**
      * Add a TextView containing the question text.
      */
@@ -154,7 +143,6 @@ public class QuestionView extends ScrollView {
         tv.setHorizontallyScrolling(false);
         mView.addView(tv, mLayout);
     }
-
 
     /**
      * Add a TextView containing the help text.
@@ -174,7 +162,6 @@ public class QuestionView extends ScrollView {
             mView.addView(tv, mLayout);
         }
     }
-
 
     public void setFocus(Context context) {
         mQuestionWidget.setFocus(context);

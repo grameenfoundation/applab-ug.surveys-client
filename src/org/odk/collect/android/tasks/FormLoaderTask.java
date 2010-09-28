@@ -16,7 +16,13 @@
 
 package org.odk.collect.android.tasks;
 
-import android.os.AsyncTask;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -29,13 +35,7 @@ import org.odk.collect.android.logic.FormHandler;
 import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.utilities.FileUtils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import android.os.AsyncTask;
 
 /**
  * Background task for loading a form.
@@ -46,10 +46,9 @@ import java.io.IOException;
 public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
     FormLoaderListener mStateListener;
 
-
     /**
-     * Initialize {@link FormHandler} with {@link FormDef} from binary or from
-     * XML. If given an instance, it will be used to fill the {@link FormDef}.
+     * Initialize {@link FormHandler} with {@link FormDef} from binary or from XML. If given an instance, it will be
+     * used to fill the {@link FormDef}.
      */
     @Override
     protected FormHandler doInBackground(String... path) {
@@ -70,7 +69,8 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
             if (fd == null) {
                 return null;
             }
-        } else {
+        }
+        else {
             // no binary, read from xml
             try {
                 fis = new FileInputStream(formXml);
@@ -81,7 +81,8 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
                 fd.setEvaluationContext(new EvaluationContext());
                 serializeFormDef(fd, formPath);
 
-            } catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -93,7 +94,8 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
         if (instancePath != null) {
             fh.preProcessForm(false);
             fh.importData(instancePath);
-        } else {
+        }
+        else {
             fh.preProcessForm(true);
         }
 
@@ -108,11 +110,11 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
         return fh;
     }
 
-
     /**
      * Read serialized {@link FormDef} from file and recreate as object.
      * 
-     * @param formDef serialized FormDef file
+     * @param formDef
+     *            serialized FormDef file
      * @return {@link FormDef} object
      */
     public FormDef deserializeFormDef(File formDef) {
@@ -133,22 +135,25 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
             fd.readExternal(dis, ExtUtil.defaultPrototypes());
             dis.close();
 
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
-        } catch (DeserializationException e) {
+        }
+        catch (DeserializationException e) {
             e.printStackTrace();
         }
 
         return fd;
     }
 
-
     /**
      * Write the FormDef to the file system as a binary blog.
      * 
-     * @param filepath path to the form file
+     * @param filepath
+     *            path to the form file
      */
     public void serializeFormDef(FormDef fd, String filepath) {
         // if cache folder is missing, create it.
@@ -167,23 +172,24 @@ public class FormLoaderTask extends AsyncTask<String, String, FormHandler> {
                     fd.writeExternal(dos);
                     dos.flush();
                     dos.close();
-                } catch (FileNotFoundException e) {
+                }
+                catch (FileNotFoundException e) {
                     e.printStackTrace();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
 
-
     @Override
     protected void onPostExecute(FormHandler fh) {
         synchronized (this) {
-            if (mStateListener != null) mStateListener.loadingComplete(fh);
+            if (mStateListener != null)
+                mStateListener.loadingComplete(fh);
         }
     }
-
 
     public void setFormLoaderListener(FormLoaderListener sl) {
         synchronized (this) {

@@ -16,11 +16,6 @@
 
 package org.odk.collect.android.tasks;
 
-import android.os.AsyncTask;
-
-import org.odk.collect.android.listeners.FormDownloaderListener;
-import org.odk.collect.android.logic.GlobalConstants;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +25,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+
+import org.odk.collect.android.listeners.FormDownloaderListener;
+import org.odk.collect.android.logic.GlobalConstants;
+
+import android.os.AsyncTask;
 
 /**
  * Background task for downloading forms from a url.
@@ -46,13 +46,12 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
 
     public String formList = "formlist.xml";
 
-
     public void setDownloadServer(String newServer) {
         mUrl = newServer;
     }
 
     public void setImei(String newImei) {
-    	imei = newImei;
+        imei = newImei;
     }
 
     @Override
@@ -60,10 +59,12 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         if (mUrl != null && mUrl.endsWith("formList")) {
             if (downloadFile(mUrl, formList)) {
                 return mDownloadedForms;
-            } else {
+            }
+            else {
                 return null;
             }
-        } else {
+        }
+        else {
             int formCount = values.length;
             int count = 1;
             for (int i = 0; i < formCount; i = i + 2) {
@@ -80,7 +81,8 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         URL u = null;
         try {
             u = new URL(url);
-        } catch (MalformedURLException e) {
+        }
+        catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
         }
@@ -94,12 +96,13 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
 
             // write connection to file
             InputStream is = c.getInputStream();
-           
+
             // if file exists, append a number
             File f;
             if (name.equals(formList)) {
                 f = new File(GlobalConstants.CACHE_PATH + name);
-            } else {
+            }
+            else {
                 String path = GlobalConstants.FORMS_PATH + name;
                 int i = 2;
                 int slash = path.lastIndexOf("/") + 1;
@@ -125,14 +128,14 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
             is.close();
             mDownloadedForms.add(url);
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return false;
         }
 
         return true;
     }
-
 
     @Override
     protected void onPostExecute(ArrayList<String> value) {
@@ -142,8 +145,6 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
             }
         }
     }
-
-
 
     @Override
     protected void onProgressUpdate(Integer... values) {
@@ -155,7 +156,6 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         }
 
     }
-
 
     public void setDownloaderListener(FormDownloaderListener sl) {
         synchronized (this) {

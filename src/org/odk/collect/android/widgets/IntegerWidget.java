@@ -16,17 +16,17 @@
 
 package org.odk.collect.android.widgets;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.logic.PromptElement;
+
 import android.content.Context;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
 
 /**
  * Widget that restricts values to integers.
@@ -39,11 +39,9 @@ public class IntegerWidget extends StringWidget {
         super(context);
     }
 
-
     public IntegerWidget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
 
     @Override
     public void buildView(PromptElement prompt) {
@@ -69,26 +67,26 @@ public class IntegerWidget extends StringWidget {
             setClickable(false);
         }
 
-        Integer i = (Integer) prompt.getAnswerObject();
+        Integer i = (Integer)prompt.getAnswerObject();
         if (i != null) {
             setText(i.toString());
         }
     }
-
 
     @Override
     public IAnswerData getAnswer() {
         String s = getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        } else {
+        }
+        else {
             try {
                 return new IntegerData(Integer.parseInt(s));
-            } catch (Exception NumberFormatException) {
+            }
+            catch (Exception NumberFormatException) {
                 return null;
             }
         }
     }
-    
-    
+
 }

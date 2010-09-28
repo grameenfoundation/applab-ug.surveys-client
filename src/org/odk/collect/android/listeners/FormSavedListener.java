@@ -16,7 +16,6 @@
 
 package org.odk.collect.android.listeners;
 
-
 /**
  * @author Carl Hartung (carlhartung@gmail.com)
  */

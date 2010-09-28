@@ -16,15 +16,15 @@
 
 package org.odk.collect.android.tasks;
 
-import android.content.Context;
-import android.os.AsyncTask;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.listeners.FormSavedListener;
 import org.odk.collect.android.logic.FormHandler;
 import org.odk.collect.android.logic.GlobalConstants;
+
+import android.content.Context;
+import android.os.AsyncTask;
 
 /**
  * Background task for loading a form.
@@ -45,10 +45,9 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
     public static final int VALIDATE_ERROR = 502;
     public static final int VALIDATED = 503;
 
-
     /**
-     * Initialize {@link FormHandler} with {@link FormDef} from binary or from
-     * XML. If given an instance, it will be used to fill the {@link FormDef}.
+     * Initialize {@link FormHandler} with {@link FormDef} from binary or from XML. If given an instance, it will be
+     * used to fill the {@link FormDef}.
      */
     @Override
     protected Integer doInBackground(Void... nothing) {
@@ -64,14 +63,13 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
         return SAVE_ERROR;
     }
 
-
     @Override
     protected void onPostExecute(Integer result) {
         synchronized (this) {
-            if (mSavedListener != null) mSavedListener.savingComplete(result);
+            if (mSavedListener != null)
+                mSavedListener.savingComplete(result);
         }
     }
-
 
     public void setFormSavedListener(FormSavedListener fsl) {
         synchronized (this) {
@@ -79,13 +77,11 @@ public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
         }
     }
 
-
     public void setExportVars(String instancePath, Context context, Boolean completed) {
         mInstancePath = instancePath;
         mContext = context;
         mMarkCompleted = completed;
     }
-
 
     // make sure this validates for all on done
     private int validateAnswers(boolean markCompleted) {

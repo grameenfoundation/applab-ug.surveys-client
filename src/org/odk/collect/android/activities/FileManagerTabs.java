@@ -16,6 +16,8 @@
 
 package org.odk.collect.android.activities;
 
+import org.odk.collect.android.logic.GlobalConstants;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,9 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
-
 import applab.surveys.client.R;
-import org.odk.collect.android.logic.GlobalConstants;
 
 /**
  * An example of tab content that launches an activity via
@@ -39,7 +39,6 @@ public class FileManagerTabs extends TabActivity {
     private static TextView mTVRF;
     private static final String LOCAL_TAB = "local_tab";
     private static final String REMOTE_TAB = "remote_tab";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,25 +59,25 @@ public class FileManagerTabs extends TabActivity {
                 .setContent(remote));
 
         // hack to set font size
-        LinearLayout ll = (LinearLayout) tabHost.getChildAt(0);
-        TabWidget tw = (TabWidget) ll.getChildAt(0);
+        LinearLayout ll = (LinearLayout)tabHost.getChildAt(0);
+        TabWidget tw = (TabWidget)ll.getChildAt(0);
 
-        RelativeLayout rllf = (RelativeLayout) tw.getChildAt(0);
-        mTVLF = (TextView) rllf.getChildAt(1);
+        RelativeLayout rllf = (RelativeLayout)tw.getChildAt(0);
+        mTVLF = (TextView)rllf.getChildAt(1);
         mTVLF.setTextSize(GlobalConstants.APPLICATION_FONTSIZE - 2);
         mTVLF.setPadding(0, 0, 0, 6);
 
-        RelativeLayout rlrf = (RelativeLayout) tw.getChildAt(1);
-        mTVRF = (TextView) rlrf.getChildAt(1);
+        RelativeLayout rlrf = (RelativeLayout)tw.getChildAt(1);
+        mTVRF = (TextView)rlrf.getChildAt(1);
         mTVRF.setTextSize(GlobalConstants.APPLICATION_FONTSIZE - 2);
         mTVRF.setPadding(0, 0, 0, 6);
     }
 
-
     public static void setTabHeader(String string, String tab) {
         if (tab.equals(LOCAL_TAB)) {
             mTVLF.setText(string);
-        } else if (tab.equals(REMOTE_TAB)) {
+        }
+        else if (tab.equals(REMOTE_TAB)) {
             mTVRF.setText(string);
         }
     }

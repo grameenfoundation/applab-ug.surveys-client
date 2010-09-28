@@ -16,6 +16,14 @@
 
 package org.odk.collect.android.activities;
 
+import java.util.ArrayList;
+
+import org.odk.collect.android.database.FileDbAdapter;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.preferences.ServerPreferences;
+import org.odk.collect.android.tasks.InstanceUploaderTask;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -27,15 +35,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
-
 import applab.surveys.client.R;
-import org.odk.collect.android.database.FileDbAdapter;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.preferences.ServerPreferences;
-import org.odk.collect.android.tasks.InstanceUploaderTask;
-
-import java.util.ArrayList;
 
 /**
  * Activity to upload completed forms.
@@ -52,7 +52,6 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
     private InstanceUploaderTask mInstanceUploaderTask;
     private int totalCount = -1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +66,8 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
             return;
         }
 
-        // get the task if we've changed orientations.  If it's null it's a new upload.
-        mInstanceUploaderTask = (InstanceUploaderTask) getLastNonConfigurationInstance();
+        // get the task if we've changed orientations. If it's null it's a new upload.
+        mInstanceUploaderTask = (InstanceUploaderTask)getLastNonConfigurationInstance();
         if (mInstanceUploaderTask == null) {
             // setup dialog and upload task
             showDialog(PROGRESS_DIALOG);
@@ -80,18 +79,17 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                     settings.getString(ServerPreferences.KEY_SERVER,
                             getString(R.string.default_server))
                             + "/submission";
-            
+
             mInstanceUploaderTask.setUploadServer(url);
-            
+
             // Set imei to pass along with the URL;
-            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
             String imei = telephonyManager.getDeviceId();
-            
-            if(imei != null)
-            {
-            	mInstanceUploaderTask.setImei(imei);
+
+            if (imei != null) {
+                mInstanceUploaderTask.setImei(imei);
             }
-            
+
             totalCount = instances.size();
 
             // convert array list to an array
@@ -99,7 +97,6 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
             mInstanceUploaderTask.execute(sa);
         }
     }
-
 
     // TODO: if uploadingComplete() when activity backgrounded, won't work.
     // just check task status in onResume
@@ -111,7 +108,8 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
                     Toast.LENGTH_SHORT).show();
 
             success = true;
-        } else {
+        }
+        else {
             String s = totalCount - resultSize + " of " + totalCount;
             Toast.makeText(this, getString(R.string.upload_some_failed, s), Toast.LENGTH_LONG)
                     .show();
@@ -120,31 +118,26 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         Intent in = new Intent();
         in.putExtra(GlobalConstants.KEY_SUCCESS, success);
         setResult(RESULT_OK, in);
-        //Commenting out the code below so submitted data is automatically removed and 
-        //doesn't just sit around on the device till a manual delete. 
-        //Linked issue: ZBR-84
-        /* // for each path, update the status
-       FileDbAdapter fda = new FileDbAdapter(this);
-        fda.open();
-        for (int i = 0; i < resultSize; i++) {
-            fda.updateFile(result.get(i), FileDbAdapter.STATUS_SUBMITTED);            
-        }
-        fda.close();*/
-        //Delete submitted data from database and then remove the data from sd
+        // Commenting out the code below so submitted data is automatically removed and
+        // doesn't just sit around on the device till a manual delete.
+        // Linked issue: ZBR-84
+        /*
+         * // for each path, update the status FileDbAdapter fda = new FileDbAdapter(this); fda.open(); for (int i = 0;
+         * i < resultSize; i++) { fda.updateFile(result.get(i), FileDbAdapter.STATUS_SUBMITTED); } fda.close();
+         */
+        // Delete submitted data from database and then remove the data from sd
         FileDbAdapter fileDbAdapter = new FileDbAdapter(this);
         fileDbAdapter.open();
         fileDbAdapter.deleteFiles(result);
         fileDbAdapter.removeOrphanInstances();
         fileDbAdapter.close();
-        
+
         finish();
     }
-
 
     public void progressUpdate(int progress, int total) {
         mProgressDialog.setMessage("Sending " + progress + " of " + total + " item(s)");
     }
-
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -170,13 +163,11 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         return null;
     }
 
-
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         totalCount = savedInstanceState.getInt(KEY_TOTALCOUNT);
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -184,19 +175,16 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         outState.putInt(KEY_TOTALCOUNT, totalCount);
     }
 
-
     @Override
     public Object onRetainNonConfigurationInstance() {
         return mInstanceUploaderTask;
     }
-
 
     @Override
     protected void onDestroy() {
         mInstanceUploaderTask.setUploaderListener(null);
         super.onDestroy();
     }
-
 
     @Override
     protected void onResume() {

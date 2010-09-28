@@ -16,6 +16,8 @@
 
 package org.odk.collect.android.logic;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -27,12 +29,9 @@ import org.javarosa.formmanager.view.FormElementBinding;
 import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.views.QuestionView;
 
-import java.util.Vector;
-
 /**
- * Used by {@link QuestionView} to display Questions and by
- * {@link FormEntryActivity} to display Repeat dialogs. Much of this class is a
- * wrapper for @ link FormElementBinding}
+ * Used by {@link QuestionView} to display Questions and by {@link FormEntryActivity} to display Repeat dialogs. Much of
+ * this class is a wrapper for @ link FormElementBinding}
  * 
  * 
  * @author Yaw Anokwa (yanokwa@gmail.com)
@@ -54,17 +53,14 @@ public class PromptElement {
 
     private int type;
 
-
     public PromptElement(int promptType) {
         type = promptType;
     }
-
 
     public PromptElement(Vector<GroupElement> groups) {
         mGroups = groups;
         type = TYPE_REPEAT_DIALOG;
     }
-
 
     public PromptElement(FormIndex formIndex, FormDef formDef, Vector<GroupElement> groups) {
         mBinding = new FormElementBinding(null, formIndex, formDef);
@@ -72,11 +68,9 @@ public class PromptElement {
         type = TYPE_QUESTION;
     }
 
-
     public int getType() {
         return type;
     }
-
 
     /**
      * A prompt's {@link QuestionDef}
@@ -84,9 +78,8 @@ public class PromptElement {
      * @return QuestionDef
      */
     public QuestionDef getQuestionDef() {
-        return (QuestionDef) mBinding.element;
+        return (QuestionDef)mBinding.element;
     }
-
 
     /**
      * The instance name (question id) and the repeat count
@@ -95,19 +88,18 @@ public class PromptElement {
         int count = getLastRepeatCount() + 1;
         if (count < 1) {
             return mBinding.instanceNode.getName();
-        } else {
+        }
+        else {
             return mBinding.instanceNode.getName() + count;
         }
     }
-
 
     /**
      * The data type of the answer (input, upload, etc)
      */
     public int getQuestionType() {
-        return ((QuestionDef) mBinding.element).getControlType();
+        return ((QuestionDef)mBinding.element).getControlType();
     }
-
 
     /**
      * The data type of the answer (decimal, integer, string, select multi, etc)
@@ -116,7 +108,6 @@ public class PromptElement {
         return mBinding.instanceNode.dataType;
     }
 
-
     /**
      * Is a response to this question required?
      */
@@ -124,18 +115,17 @@ public class PromptElement {
         return mBinding.instanceNode.required;
     }
 
-
     /**
      * Is this question read only?
      */
     public boolean isReadOnly() {
         if (mBinding != null) {
             return !mBinding.instanceNode.isEnabled();
-        } else {
+        }
+        else {
             return false;
         }
     }
-
 
     /**
      * @see TreeReference
@@ -144,7 +134,6 @@ public class PromptElement {
         return mBinding.instanceRef;
     }
 
-
     /**
      * @see TreeElement
      */
@@ -152,18 +141,17 @@ public class PromptElement {
         return mBinding.instanceNode;
     }
 
-
     /**
      * The answer to a question in the prompt as a standard Java object.
      */
     public Object getAnswerObject() {
         if (getAnswerValue() != null) {
             return getAnswerValue().getValue();
-        } else {
+        }
+        else {
             return null;
         }
     }
-
 
     /**
      * The answer to a question in the prompt as an {@link IAnswerData}.
@@ -172,18 +160,17 @@ public class PromptElement {
         return mBinding.getValue();
     }
 
-
     /**
      * The text of the answer to a question in the prompt.
      */
     public String getAnswerText() {
         if (getAnswerValue() != null) {
             return getAnswerValue().getDisplayText();
-        } else {
+        }
+        else {
             return null;
         }
     }
-
 
     /**
      * The text of message to display if a constraint is violated.
@@ -192,31 +179,27 @@ public class PromptElement {
         return mBinding.instanceNode.getConstraint().constraintMsg;
     }
 
-
     /**
      * The items in a select question type.
      */
     public OrderedHashtable getSelectItems() {
-        return (((QuestionDef) mBinding.element).getSelectItems());
+        return (((QuestionDef)mBinding.element).getSelectItems());
     }
-
 
     /**
      * The text of question in the prompt.
      */
     public String getQuestionText() {
-        return mBinding.form.fillTemplateString(((QuestionDef) mBinding.element).getLongText(),
+        return mBinding.form.fillTemplateString(((QuestionDef)mBinding.element).getLongText(),
                 mBinding.instanceRef);
     }
-
 
     /**
      * The help text of question in the prompt.
      */
     public String getHelpText() {
-        return (((QuestionDef) mBinding.element).getHelpText());
+        return (((QuestionDef)mBinding.element).getHelpText());
     }
-
 
     /**
      * The repeat count of closest group the prompt belongs to.
@@ -228,7 +211,6 @@ public class PromptElement {
         return -1;
     }
 
-
     /**
      * The text of closest group the prompt belongs to.
      */
@@ -238,7 +220,6 @@ public class PromptElement {
         }
         return null;
     }
-
 
     /**
      * The name of the closest group that repeats or null.
@@ -258,7 +239,6 @@ public class PromptElement {
         return null;
     }
 
-
     /**
      * The count of the closest group that repeats or -1.
      */
@@ -277,14 +257,12 @@ public class PromptElement {
         return -1;
     }
 
-
     /**
      * Get all the groups a prompt belongs to.
      */
     public Vector<GroupElement> getGroups() {
         return mGroups;
     }
-
 
     /**
      * The closest group the prompt belongs to.
@@ -298,14 +276,14 @@ public class PromptElement {
         return null;
     }
 
-
     public boolean isInRepeatableGroup() {
         if (mGroups != null) {
             if (mGroups.isEmpty()) {
                 return false;
             }
             for (GroupElement group : mGroups) {
-                if (group.isRepeat()) return true;
+                if (group.isRepeat())
+                    return true;
             }
         }
         return false;
