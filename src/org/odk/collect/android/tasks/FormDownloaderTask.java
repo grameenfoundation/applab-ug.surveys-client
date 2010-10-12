@@ -30,6 +30,7 @@ import org.odk.collect.android.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.GlobalConstants;
 
 import android.os.AsyncTask;
+import applab.client.HttpHelpers;
 
 /**
  * Background task for downloading forms from a url.
@@ -48,10 +49,6 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
 
     public void setDownloadServer(String newServer) {
         mUrl = newServer;
-    }
-
-    public void setImei(String newImei) {
-        imei = newImei;
     }
 
     @Override
@@ -90,7 +87,7 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
         try {
             // prevent deadlock when connection is invalid
             URLConnection c = u.openConnection();
-            c.setRequestProperty("x-Imei", imei);
+            HttpHelpers.addCommonHeaders(c);
             c.setConnectTimeout(GlobalConstants.CONNECTION_TIMEOUT);
             c.setReadTimeout(GlobalConstants.CONNECTION_TIMEOUT);
 

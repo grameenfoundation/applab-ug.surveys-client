@@ -43,6 +43,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import applab.client.ApplabActivity;
 import applab.client.BrowserActivity;
 import applab.client.BrowserResultDialog;
 import applab.client.Handset;
@@ -183,6 +184,10 @@ public class MainMenuActivity extends Activity {
 				startActivity(i);
 			}
 		});
+		
+		// Initialize Applab Specific stuff (we do it here because this is the entry activity for ODK)
+		// Allows us to access some variables like Handset and version
+		ApplabActivity.initialize(this);
 	}
 
 	private void tryOpenFormChooser() {

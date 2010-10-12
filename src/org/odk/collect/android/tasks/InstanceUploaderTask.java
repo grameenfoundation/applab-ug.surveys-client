@@ -36,6 +36,7 @@ import org.odk.collect.android.logic.GlobalConstants;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import applab.client.HttpHelpers;
 
 /**
  * Background task for uploading completed forms.
@@ -53,10 +54,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
     public void setUploadServer(String newServer) {
         mUrl = newServer;
-    }
-
-    public void setImei(String newImei) {
-        imei = newImei;
     }
 
     @Override
@@ -77,7 +74,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
 
             HttpPost httppost = new HttpPost(mUrl);
-            httppost.setHeader("x-Imei", imei);
+            HttpHelpers.addCommonHeaders(httppost);
 
             // get instance file
             File file = new File(values[i]);

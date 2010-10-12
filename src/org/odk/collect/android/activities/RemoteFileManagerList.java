@@ -126,14 +126,6 @@ public class RemoteFileManagerList extends ListActivity implements FormDownloade
         mFormDownloadTask = new FormDownloaderTask();
         mFormDownloadTask.setDownloaderListener(RemoteFileManagerList.this);
 
-        // Set imei to pass along with the URL;
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String imei = telephonyManager.getDeviceId();
-
-        if (imei != null) {
-            mFormDownloadTask.setImei(imei);
-        }
-
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String url =

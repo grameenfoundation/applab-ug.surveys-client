@@ -82,14 +82,6 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
 
             mInstanceUploaderTask.setUploadServer(url);
 
-            // Set imei to pass along with the URL;
-            TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-            String imei = telephonyManager.getDeviceId();
-
-            if (imei != null) {
-                mInstanceUploaderTask.setImei(imei);
-            }
-
             totalCount = instances.size();
 
             // convert array list to an array
