@@ -188,6 +188,9 @@ public class MainMenuActivity extends Activity {
 		// Initialize Applab Specific stuff (we do it here because this is the entry activity for ODK)
 		// Allows us to access some variables like Handset and version
 		ApplabActivity.initialize(this);
+		
+		// Set the app version
+        ApplabActivity.setAppVersion(this.getString(R.string.app_version));
 	}
 
 	private void tryOpenFormChooser() {
