@@ -210,7 +210,9 @@ public class FileUtils {
         finally {
             // Close the input stream
             try {
-                is.close();
+            	if(is != null){
+            		is.close();
+            	}
             }
             catch (IOException e) {
                 Log.e(t, "Cannot close input stream for " + file.getName());
