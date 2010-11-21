@@ -424,7 +424,7 @@ public class MainMenuActivity extends Activity implements Runnable {
             case FORGOT_ID_CODE:
                 if (resultCode == RESULT_OK) {
                     if (intent != null) {
-                        final String farmerId = intent.getStringExtra("data");
+                        final String farmerId = intent.getStringExtra(BrowserActivity.EXTRA_DATA_INTENT);
                         BrowserResultDialog.show(this, "Selected ID: " + farmerId,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
