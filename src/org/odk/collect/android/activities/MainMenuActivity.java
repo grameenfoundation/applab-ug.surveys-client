@@ -275,9 +275,9 @@ public class MainMenuActivity extends Activity implements Runnable {
                             serverUrl + "services/" + urlPattern + "?handsetId="
                                     + Handset.getImei(this) + "&farmerId="
                                     + farmerName);
-                    
+
                     startActivityForResult(webActivity, requestCode);
-                }    
+                }
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(),
@@ -397,7 +397,14 @@ public class MainMenuActivity extends Activity implements Runnable {
                 break;
             case REGISTRATION_CODE:
                 if (resultCode == RESULT_OK) {
-                    BrowserResultDialog.show(this, "Registration successful.",
+
+                    String message = "Registration successful.";
+                    long result = this.farmerRegController.saveNewFarmerRegistration(intent
+                            .getBundleExtra(BrowserActivity.EXTRA_DATA_INTENT));
+                    if (result < 0)
+                        message = "Failed to save farmer registration record.";
+
+                    BrowserResultDialog.show(this, message,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     tryOpenFormChooser();
