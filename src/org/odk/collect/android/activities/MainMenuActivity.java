@@ -27,11 +27,15 @@ import org.odk.collect.android.utilities.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -57,7 +61,7 @@ import applab.surveys.client.R;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class MainMenuActivity extends Activity {
+public class MainMenuActivity extends Activity implements Runnable {
 
     // request codes for returning chosen form to main menu.
     private static final int FORM_CHOOSER = 0;
@@ -86,6 +90,11 @@ public class MainMenuActivity extends Activity {
     private static int mFormsCount;
 
     private FarmerRegistrationController farmerRegController;
+
+    private int requestCode;
+    private ProgressDialog progressDialog;
+    private String errorMessage;
+    private static final int PROGRESS_DIALOG = 1;
 
     public MainMenuActivity() {
         this.farmerRegController = new FarmerRegistrationController();
@@ -255,13 +264,9 @@ public class MainMenuActivity extends Activity {
                         getString(R.string.default_server));
 
                 if (requestCode == REGISTRATION_CODE) {
-                    String html = this.farmerRegController.getFormHtml(farmerName, serverUrl /* Settings.getServerUrl() */);
-                    if (html != null) {
-                        webActivity.putExtra(BrowserActivity.EXTRA_HTML_INTENT, html);
-                    }
-                    else {
-                        ApplabActivity.showToast("Failed to get the farmer registration form. Please try again.");
-                    }
+                    showDialog(PROGRESS_DIALOG);
+                    this.requestCode = requestCode;
+                    new Thread(this).start();
                 }
                 else {
                     // Temporary edit for base url to use services instead of zebra
@@ -270,9 +275,9 @@ public class MainMenuActivity extends Activity {
                             serverUrl + "services/" + urlPattern + "?handsetId="
                                     + Handset.getImei(this) + "&farmerId="
                                     + farmerName);
-                }
-
-                startActivityForResult(webActivity, requestCode);
+                    
+                    startActivityForResult(webActivity, requestCode);
+                }    
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(),
@@ -524,4 +529,50 @@ public class MainMenuActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void run() {
+
+        if (requestCode == REGISTRATION_CODE) {
+
+            errorMessage = null;
+
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            String serverUrl = settings.getString(ServerPreferences.KEY_SERVER, getString(R.string.default_server));
+
+            String html = this.farmerRegController.getFormHtml(GlobalConstants.intervieweeName, serverUrl);
+
+            if (html != null) {
+                Intent webActivity = new Intent(getApplicationContext(), BrowserActivity.class);
+                webActivity.putExtra(BrowserActivity.EXTRA_HTML_INTENT, html);
+                startActivityForResult(webActivity, requestCode);
+            }
+            else {
+                errorMessage = "Failed to get the farmer registration form. Please try again.";
+            }
+
+            // Dismiss the progress window.
+            handler.sendEmptyMessage(0);
+        }
+    }
+
+    private Handler handler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            dismissDialog(PROGRESS_DIALOG);
+
+            if (errorMessage != null)
+                BrowserResultDialog.show(ApplabActivity.getGlobalContext(), errorMessage);
+        }
+    };
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(getTitle());
+        progressDialog.setMessage("Loading Form. Please wait ...");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+
+        return progressDialog;
+    }
 }
