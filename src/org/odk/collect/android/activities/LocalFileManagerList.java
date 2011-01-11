@@ -16,9 +16,13 @@
 
 package org.odk.collect.android.activities;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.odk.collect.android.database.FileDbAdapter;
+import org.odk.collect.android.logic.GlobalConstants;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -46,6 +50,9 @@ public class LocalFileManagerList extends ListActivity {
 
     private SimpleCursorAdapter mInstances;
     private ArrayList<Long> mSelected = new ArrayList<Long>();
+
+    /** List of paths to form definitions that have been selected by the user. */
+    private ArrayList<String> mSelectedFormDefPaths = new ArrayList<String>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,8 +109,9 @@ public class LocalFileManagerList extends ListActivity {
                     public void onClick(DialogInterface dialog, int i) {
                         switch (i) {
                             case DialogInterface.BUTTON1: // delete and
-                                deleteSelectedFiles();
-                                refreshData();
+                                if (deleteSelectedFiles()) {
+                                    refreshData();
+                                }
                                 break;
                             case DialogInterface.BUTTON2: // do nothing
                                 break;
@@ -122,13 +130,21 @@ public class LocalFileManagerList extends ListActivity {
             mInstances.getCursor().requery();
         }
         mSelected.clear();
+        this.mSelectedFormDefPaths.clear();
         refreshView();
     }
 
     /**
      * Deletes the selected files.First from the database then from the file system
+     * 
+     * @return true if deleted any files, else false.
      */
-    private void deleteSelectedFiles() {
+    private boolean deleteSelectedFiles() {
+
+        if (isThereAnySelectedFormWithData()) {
+            return false;
+        }
+
         FileDbAdapter fda = new FileDbAdapter(this);
         fda.open();
 
@@ -162,6 +178,7 @@ public class LocalFileManagerList extends ListActivity {
                             + mSelected.size()), Toast.LENGTH_LONG).show();
         }
 
+        return true;
     }
 
     @Override
@@ -173,10 +190,23 @@ public class LocalFileManagerList extends ListActivity {
         long k = c.getLong(c.getColumnIndex(FileDbAdapter.KEY_ID));
 
         // add/remove from selected list
-        if (mSelected.contains(k))
+        if (mSelected.contains(k)) {
             mSelected.remove(k);
-        else
+        }
+        else {
             mSelected.add(k);
+        }
+
+        //Check if the selected file is a form definition instead of instance data.
+        String filePath = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
+        if (filePath.contains("/forms/") && !filePath.contains("/instances/")) {
+            if (mSelectedFormDefPaths.contains(filePath)) {
+                this.mSelectedFormDefPaths.remove(filePath);
+            }
+            else {
+                this.mSelectedFormDefPaths.add(filePath);
+            }
+        }
     }
 
     @Override
@@ -194,4 +224,81 @@ public class LocalFileManagerList extends ListActivity {
         super.onResume();
     }
 
+    /**
+     * Checks if there is any selected form definition that has instance data.
+     * 
+     * @return true if there is any, else false if none.
+     */
+    private boolean isThereAnySelectedFormWithData() {
+        List<String> instanceFormDefs = getInstanceFormDefs();
+
+        for (String filePath : this.mSelectedFormDefPaths) {
+            if (instanceFormDefs.contains(filePath)) {
+                String message = filePath.substring(filePath.lastIndexOf('/') + 1) + " Cannot be deleted because it has data.";
+                message = message.replace(".xml", " Form");
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets a list of form definitions that have instances of data.
+     * 
+     * @return a list of paths to the form definitions.
+     */
+    private List<String> getInstanceFormDefs() {
+        List<String> instanceFormDefs = new ArrayList<String>();
+
+        FileDbAdapter fda = new FileDbAdapter(this);
+        fda.open();
+
+        Cursor cursor = fda.fetchFilesByType(FileDbAdapter.TYPE_INSTANCE, null);
+        if (cursor != null) {
+            while (!cursor.isAfterLast()) {
+                String instancePath = cursor.getString(cursor.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
+                String formPath = getFormPathFromInstancePath(instancePath);
+                if (!instanceFormDefs.contains(formPath)) {
+                    instanceFormDefs.add(formPath);
+                }
+
+                cursor.moveToNext();
+            }
+        }
+
+        fda.close();
+
+        return instanceFormDefs;
+    }
+
+    /**
+     * Given an instance path, return the full path to the form definition.
+     * 
+     * @param instancePath
+     *            full path to the instance
+     * @return formPath full path to the form the instance was generated from
+     */
+    public String getFormPathFromInstancePath(String instancePath) {
+        // trim the farmer id and timestamp
+        String regex = "\\_\\[[a-zA-Z]{2}[0-9]{4,5}+\\]\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
+        Pattern pattern = Pattern.compile(regex);
+        String formName = pattern.split(instancePath)[0];
+        formName = formName.substring(formName.lastIndexOf("/") + 1);
+
+        File xmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xml");
+        File xhtmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xhtml");
+
+        // form is either xml or xhtml file. find the appropriate one.
+        if (xmlFile.exists()) {
+            return xmlFile.getAbsolutePath();
+        }
+        else if (xhtmlFile.exists()) {
+            return xhtmlFile.getAbsolutePath();
+        }
+        else {
+            return null;
+        }
+    }
 }

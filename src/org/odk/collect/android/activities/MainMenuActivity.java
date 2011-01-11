@@ -25,7 +25,6 @@ import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.preferences.ServerPreferences;
 import org.odk.collect.android.utilities.FileUtils;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -38,7 +37,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +49,11 @@ import applab.client.ApplabActivity;
 import applab.client.BrowserActivity;
 import applab.client.BrowserResultDialog;
 import applab.client.Handset;
-import applab.client.controller.FarmerRegistrationController;
+import applab.client.HttpHelpers;
+import applab.client.dataconnection.DataConnectionManager;
+import applab.client.farmerregistration.FarmerRegistrationAdapter;
+import applab.client.farmerregistration.FarmerRegistrationController;
+import applab.client.location.GpsManager;
 import applab.surveys.client.R;
 
 /**
@@ -61,7 +63,7 @@ import applab.surveys.client.R;
  * @author Carl Hartung (carlhartung@gmail.com)
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
-public class MainMenuActivity extends Activity implements Runnable {
+public class MainMenuActivity extends ApplabActivity implements Runnable {
 
     // request codes for returning chosen form to main menu.
     private static final int FORM_CHOOSER = 0;
@@ -103,6 +105,9 @@ public class MainMenuActivity extends Activity implements Runnable {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ApplabActivity.setAppVersion(getString(R.string.app_version));
+
         requestWindowFeature(Window.FEATURE_RIGHT_ICON);
         setContentView(R.layout.main_menu);
         setFeatureDrawableResource(Window.FEATURE_RIGHT_ICON, R.drawable.notes);
@@ -116,6 +121,10 @@ public class MainMenuActivity extends Activity implements Runnable {
         mEnterDataButton = (Button)findViewById(R.id.enter_data);
         mEnterDataButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+
+                // Start GPS search as a survey is being filled.
+                GpsManager.getInstance().update();
+
                 String farmerName = farmerNameEditBox.getText().toString()
                         .trim();
                 if (farmerName.length() > 0) {
@@ -204,13 +213,6 @@ public class MainMenuActivity extends Activity implements Runnable {
                 startActivity(i);
             }
         });
-
-        // Initialize Applab Specific stuff (we do it here because this is the entry activity for ODK)
-        // Allows us to access some variables like Handset and version
-        ApplabActivity.initialize(this);
-
-        // Set the app version
-        ApplabActivity.setAppVersion(this.getString(R.string.app_version));
     }
 
     private void tryOpenFormChooser() {
@@ -254,6 +256,10 @@ public class MainMenuActivity extends Activity implements Runnable {
             if (urlPattern.contentEquals("findFarmerId") || checkID(farmerName)) {
                 // Set the farmer ID
                 GlobalConstants.intervieweeName = farmerName;
+
+                // Start GPS search for: Farmer Registration, Forgot Farmer ID Search
+                GpsManager.getInstance().update();
+
                 Intent webActivity = new Intent(getApplicationContext(),
                         BrowserActivity.class);
 
@@ -272,7 +278,7 @@ public class MainMenuActivity extends Activity implements Runnable {
                     // Temporary edit for base url to use services instead of zebra
                     serverUrl = serverUrl.substring(0, serverUrl.length() - 5);
                     webActivity.putExtra(BrowserActivity.EXTRA_URL_INTENT,
-                            serverUrl + "services/" + urlPattern + "?handsetId="
+                            serverUrl + "services/" + urlPattern + HttpHelpers.getCommonParameters() + "&handsetId="
                                     + Handset.getImei(this) + "&farmerId="
                                     + farmerName);
 
@@ -325,33 +331,6 @@ public class MainMenuActivity extends Activity implements Runnable {
         alert.show();
     }
 
-    /**
-     * Return an InputFilter that can validate farmer id characters entered in the UI
-     */
-    public InputFilter getFarmerInputFilter() {
-        return new InputFilter() {
-            public CharSequence filter(CharSequence source, int start, int end,
-                                       Spanned destination, int destinationStart,
-                                       int destinationEnd) {
-                for (int characterIndex = start; characterIndex < end; characterIndex++) {
-                    char currentCharacter = source.charAt(characterIndex);
-                    if (Character.isLetterOrDigit(currentCharacter)) {
-                        continue;
-                    }
-
-                    if (Character.isWhitespace(currentCharacter)) {
-                        continue;
-                    }
-                    Toast toast = Toast.makeText(getApplicationContext(),
-                            "Invalid Character", Toast.LENGTH_SHORT);
-                    toast.show();
-                    return "";
-                }
-                return null;
-            }
-        };
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -398,11 +377,14 @@ public class MainMenuActivity extends Activity implements Runnable {
             case REGISTRATION_CODE:
                 if (resultCode == RESULT_OK) {
 
+                    Bundle bundle = intent.getBundleExtra(BrowserActivity.EXTRA_DATA_INTENT);
+                    bundle.putString(FarmerRegistrationAdapter.KEY_LOCATION, GpsManager.getInstance().getLocationAsString());
+
                     String message = "Registration successful.";
-                    long result = this.farmerRegController.saveNewFarmerRegistration(intent
-                            .getBundleExtra(BrowserActivity.EXTRA_DATA_INTENT));
-                    if (result < 0)
+                    long result = this.farmerRegController.saveNewFarmerRegistration(bundle);
+                    if (result < 0) {
                         message = "Failed to save farmer registration record.";
+                    }
 
                     BrowserResultDialog.show(this, message,
                             new DialogInterface.OnClickListener() {
@@ -581,5 +563,18 @@ public class MainMenuActivity extends Activity implements Runnable {
         progressDialog.setCancelable(false);
 
         return progressDialog;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // We need to display only one settings screen at a time.
+        // So if no settings screen shown for GPS, try show that of mobile data, if disabled.
+        // Every time a settings screen is closed, Activity:onStart() will be called and hence
+        // help us ensure that we display all the settings screen we need, but one a time.
+        if (!GpsManager.getInstance().onStart(this)) {
+            DataConnectionManager.getInstance().onStart(this);
+        }
     }
 }

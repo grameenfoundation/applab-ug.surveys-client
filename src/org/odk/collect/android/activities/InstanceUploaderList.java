@@ -47,6 +47,8 @@ import applab.surveys.client.R;
 // TODO long click form for submission log
 public class InstanceUploaderList extends ListActivity {
 
+    public static char LOCATION_SEPARATOR = '|';
+    
     private static final int MENU_PREFERENCES = Menu.FIRST;
     private static final int INSTANCE_UPLOADER = 0;
 
@@ -119,8 +121,9 @@ public class InstanceUploaderList extends ListActivity {
         for (int i = 0; i < mSelected.size(); i++) {
             c = fda.fetchFile(mSelected.get(i));
             startManagingCursor(c);
-            String s = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
-            selectedInstances.add(s);
+            String path = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
+            String location = c.getString(c.getColumnIndex(FileDbAdapter.KEY_LOCATION));
+            selectedInstances.add(location + LOCATION_SEPARATOR + path);
         }
 
         // bundle intent with upload files

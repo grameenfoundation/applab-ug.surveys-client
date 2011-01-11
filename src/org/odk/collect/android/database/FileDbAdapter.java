@@ -36,6 +36,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.util.Log;
+import applab.client.location.GpsManager;
 import applab.surveys.client.R;
 
 /**
@@ -56,6 +57,7 @@ public class FileDbAdapter {
     public static final String KEY_STATUS = "status";
     public static final String KEY_DISPLAY = "display";
     public static final String KEY_META = "meta";
+    public static final String KEY_LOCATION = "location";
 
     // file types
     public static final String TYPE_FORM = "form";
@@ -77,13 +79,13 @@ public class FileDbAdapter {
     private SQLiteDatabase mDb;
 
     private static final String DATABASE_CREATE =
-            "create table files (_id integer primary key autoincrement, " + "path text not null, "
+            "create table IF NOT EXISTS files (_id integer primary key autoincrement, " + "path text not null, "
                     + "hash text not null, " + "type text not null, " + "status text not null, "
                     + "display text not null, " + "meta text not null);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "files";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private final Context mCtx;
 
@@ -101,7 +103,13 @@ public class FileDbAdapter {
         @Override
         // upgrading will destroy all old data
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+            String sqlStatement = "DROP TABLE IF EXISTS " + DATABASE_TABLE;
+            
+            if(DATABASE_VERSION == 2){
+                sqlStatement = "ALTER TABLE " + DATABASE_TABLE + " ADD " + KEY_LOCATION + " TEXT";
+            }
+            
+            db.execSQL(sqlStatement);
             onCreate(db);
         }
     }
@@ -202,6 +210,9 @@ public class FileDbAdapter {
 
         // second row of the row display
         cv.put(KEY_META, generateMeta(f.lastModified(), status));
+        
+        //add the location from where the form was filled/saved
+        cv.put(KEY_LOCATION, GpsManager.getInstance().getLocationAsString());
 
         long id = -1;
         try {
@@ -288,7 +299,7 @@ public class FileDbAdapter {
     public Cursor fetchFile(long id) throws SQLException {
         Cursor c =
                 mDb.query(true, DATABASE_TABLE, new String[] { KEY_ID, KEY_FILEPATH, KEY_HASH,
-                        KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META }, KEY_ID + "='" + id + "'",
+                        KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META, KEY_LOCATION }, KEY_ID + "='" + id + "'",
                         null, null, null, null, null);
 
         if (c != null) {
@@ -559,8 +570,8 @@ public class FileDbAdapter {
                     }
                     // find xml file in folder and delete folder
                     fis = fo.list(ff);
-                    if (fis != null) {
-                        c = fetchFilesByPath(instancePath + "/" + fo.list(ff)[0], null);
+                    if (fis != null && fis.length > 0) {
+                        c = fetchFilesByPath(instancePath + "/" + fis[0], null);
 
                         File dir = new File(instancePath);
                         if (dir.exists() && dir.isDirectory()) {

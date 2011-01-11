@@ -31,6 +31,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.odk.collect.android.activities.InstanceUploaderList;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
 import org.odk.collect.android.logic.GlobalConstants;
 
@@ -76,8 +77,15 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             HttpPost httppost = new HttpPost(mUrl);
             HttpHelpers.addCommonHeaders(httppost);
 
-            // get instance file
-            File file = new File(values[i]);
+            // get location and instance file
+            String locationAndPath = values[i];
+            
+            int locationSeparatorPos = locationAndPath.indexOf(InstanceUploaderList.LOCATION_SEPARATOR);
+            String location = locationAndPath.substring(0, locationSeparatorPos);
+            httppost.addHeader(HttpHelpers.LOCATION_HEADER, location);
+            
+            String path = locationAndPath.substring(locationSeparatorPos + 1);
+            File file = new File(path);
 
             // find all files in parent directory
             File[] files = file.getParentFile().listFiles();
