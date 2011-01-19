@@ -61,10 +61,10 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
                 return null;
             }
         }
-        else {
+        else {           
             int formCount = values.length;
             int count = 1;
-            for (int i = 0; i < formCount; i = i + 2) {
+            for (int i = 0; i < formCount; i = i + 2) {                 
                 downloadFile(values[i], values[i + 1]);
                 publishProgress(count, formCount / 2);
                 count++;
@@ -95,12 +95,21 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
             InputStream is = c.getInputStream();
 
             // if file exists, append a number
-            File f;
+            File f = new File(GlobalConstants.FORMS_PATH + name);
             if (name.equals(formList)) {
                 f = new File(GlobalConstants.CACHE_PATH + name);
             }
             else {
-                String path = GlobalConstants.FORMS_PATH + name;
+                
+                //The code below is commented out such that if a form already exists,
+                //we do not create a new one and append an incrementing number to it
+                //(e.g Form_2, Form_3, etc). If the file hash is the same, and this code is not commented out,
+                //FileDbAdapeter.addOrphanForms() would delete this duplicate resulting
+                //into the desired behavior. But if the file hash is different, we shall
+                //end up with such form names that have incrementing numbers appended
+                //at the end, hence confusing the user as in which form to fill.
+                
+                /*String path = GlobalConstants.FORMS_PATH + name;
                 int i = 2;
                 int slash = path.lastIndexOf("/") + 1;
                 int period = path.lastIndexOf(".") + 1;
@@ -111,7 +120,7 @@ public class FormDownloaderTask extends AsyncTask<String, Integer, ArrayList<Str
                 while (f.exists()) {
                     f = new File(base + "/" + filename + " " + i + "." + ext);
                     i++;
-                }
+                }*/
             }
 
             OutputStream os = new FileOutputStream(f);

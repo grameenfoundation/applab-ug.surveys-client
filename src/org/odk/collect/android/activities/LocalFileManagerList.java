@@ -16,13 +16,9 @@
 
 package org.odk.collect.android.activities;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.odk.collect.android.database.FileDbAdapter;
-import org.odk.collect.android.logic.GlobalConstants;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -35,6 +31,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+import applab.surveys.client.FormUtilities;
 import applab.surveys.client.R;
 
 /**
@@ -141,7 +138,7 @@ public class LocalFileManagerList extends ListActivity {
      */
     private boolean deleteSelectedFiles() {
 
-        if (isThereAnySelectedFormWithData()) {
+        if (FormUtilities.isThereAnySelectedFormWithData(this, mSelectedFormDefPaths, "Cannot be deleted because it has data. Please submit or delete the data first before deleting the form.")) {
             return false;
         }
 
@@ -222,83 +219,5 @@ public class LocalFileManagerList extends ListActivity {
         // update the list (for returning from the remote manager)
         refreshData();
         super.onResume();
-    }
-
-    /**
-     * Checks if there is any selected form definition that has instance data.
-     * 
-     * @return true if there is any, else false if none.
-     */
-    private boolean isThereAnySelectedFormWithData() {
-        List<String> instanceFormDefs = getInstanceFormDefs();
-
-        for (String filePath : this.mSelectedFormDefPaths) {
-            if (instanceFormDefs.contains(filePath)) {
-                String message = filePath.substring(filePath.lastIndexOf('/') + 1) + " Cannot be deleted because it has data.";
-                message = message.replace(".xml", " Form");
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets a list of form definitions that have instances of data.
-     * 
-     * @return a list of paths to the form definitions.
-     */
-    private List<String> getInstanceFormDefs() {
-        List<String> instanceFormDefs = new ArrayList<String>();
-
-        FileDbAdapter fda = new FileDbAdapter(this);
-        fda.open();
-
-        Cursor cursor = fda.fetchFilesByType(FileDbAdapter.TYPE_INSTANCE, null);
-        if (cursor != null) {
-            while (!cursor.isAfterLast()) {
-                String instancePath = cursor.getString(cursor.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
-                String formPath = getFormPathFromInstancePath(instancePath);
-                if (!instanceFormDefs.contains(formPath)) {
-                    instanceFormDefs.add(formPath);
-                }
-
-                cursor.moveToNext();
-            }
-        }
-
-        fda.close();
-
-        return instanceFormDefs;
-    }
-
-    /**
-     * Given an instance path, return the full path to the form definition.
-     * 
-     * @param instancePath
-     *            full path to the instance
-     * @return formPath full path to the form the instance was generated from
-     */
-    public String getFormPathFromInstancePath(String instancePath) {
-        // trim the farmer id and timestamp
-        String regex = "\\_\\[[a-zA-Z]{2}[0-9]{4,5}+\\]\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
-        Pattern pattern = Pattern.compile(regex);
-        String formName = pattern.split(instancePath)[0];
-        formName = formName.substring(formName.lastIndexOf("/") + 1);
-
-        File xmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xml");
-        File xhtmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xhtml");
-
-        // form is either xml or xhtml file. find the appropriate one.
-        if (xmlFile.exists()) {
-            return xmlFile.getAbsolutePath();
-        }
-        else if (xhtmlFile.exists()) {
-            return xhtmlFile.getAbsolutePath();
-        }
-        else {
-            return null;
-        }
     }
 }

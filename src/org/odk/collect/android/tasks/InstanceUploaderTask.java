@@ -47,6 +47,8 @@ import applab.client.HttpHelpers;
  */
 public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<String>> {
 
+    public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
+    
     private static String t = "InstanceUploaderTask";
     private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
@@ -82,7 +84,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             
             int locationSeparatorPos = locationAndPath.indexOf(InstanceUploaderList.LOCATION_SEPARATOR);
             String location = locationAndPath.substring(0, locationSeparatorPos);
-            httppost.addHeader(HttpHelpers.LOCATION_HEADER, location);
+            httppost.addHeader(SURVEY_LOCATION_HEADER, location);
             
             String path = locationAndPath.substring(locationSeparatorPos + 1);
             File file = new File(path);

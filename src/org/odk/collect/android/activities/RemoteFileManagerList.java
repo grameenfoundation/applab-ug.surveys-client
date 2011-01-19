@@ -35,7 +35,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,7 +42,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +51,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+import applab.client.ApplabActivity;
+import applab.surveys.client.FormUtilities;
 import applab.surveys.client.R;
 
 /**
@@ -234,16 +234,25 @@ public class RemoteFileManagerList extends ListActivity implements FormDownloade
         totalCount = 0;
         ArrayList<String> files = new ArrayList<String>();
 
+        /** List of paths to form definitions that have been selected by the user. */
+        ArrayList<String> selectedFormDefPaths = new ArrayList<String>();
+
         SparseBooleanArray sba = getListView().getCheckedItemPositions();
         for (int i = 0; i < getListView().getCount(); i++) {
             if (sba.get(i, false)) {
                 files.add(mFormUrl.get(i));
                 files.add(mFormName.get(i));
+                selectedFormDefPaths.add(GlobalConstants.FORMS_PATH + mFormName.get(i));
             }
         }
         totalCount = files.size();
 
         if (totalCount > 0) {
+
+            if (FormUtilities.isThereAnySelectedFormWithData(ApplabActivity.getGlobalContext(), selectedFormDefPaths,
+                    "Cannot be downloaded because it has data. Please submit or delete the data first before downloading the form.")) {
+                return;
+            }
 
             // show dialog box
             showDialog(PROGRESS_DIALOG);
