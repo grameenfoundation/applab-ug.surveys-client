@@ -1,16 +1,14 @@
 /*
  * Copyright (C) 2009 University of Washington
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
@@ -18,9 +16,10 @@ package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.activities.FormEntryActivity;
 import org.odk.collect.android.activities.GeoPointActivity;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
+import org.odk.collect.android.views.QuestionView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,23 +45,27 @@ public class GeoPointWidget extends LinearLayout implements IQuestionWidget, IBi
     private TextView mStringAnswer;
     private TextView mAnswerDisplay;
 
+
     public GeoPointWidget(Context context) {
         super(context);
     }
 
-    public void clearAnswer() {
+
+    @Override
+	public void clearAnswer() {
         mStringAnswer.setText(null);
         mAnswerDisplay.setText(null);
         mActionButton.setText(getContext().getString(R.string.get_location));
 
     }
 
-    public IAnswerData getAnswer() {
+
+    @Override
+	public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        }
-        else {
+        } else {
             try {
                 // segment lat and lon
                 String[] sa = s.split(" ");
@@ -73,28 +76,29 @@ public class GeoPointWidget extends LinearLayout implements IQuestionWidget, IBi
                 gp[3] = Double.valueOf(sa[3]).doubleValue();
 
                 return new GeoPointData(gp);
-            }
-            catch (Exception NumberFormatException) {
+            } catch (Exception NumberFormatException) {
                 return null;
             }
         }
     }
 
-    public void buildView(PromptElement prompt) {
+
+    @Override
+	public void buildView(FormEntryPrompt prompt) {
 
         setOrientation(LinearLayout.VERTICAL);
 
         mActionButton = new Button(getContext());
         mActionButton.setPadding(20, 20, 20, 20);
         mActionButton.setText(getContext().getString(R.string.get_location));
-        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mActionButton.setEnabled(!prompt.isReadOnly());
 
         mStringAnswer = new TextView(getContext());
 
         mAnswerDisplay = new TextView(getContext());
-        mAnswerDisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                GlobalConstants.APPLICATION_FONTSIZE - 1);
+        mAnswerDisplay.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+            QuestionView.APPLICATION_FONTSIZE - 1);
         mAnswerDisplay.setGravity(Gravity.CENTER);
 
         String s = prompt.getAnswerText();
@@ -105,10 +109,11 @@ public class GeoPointWidget extends LinearLayout implements IQuestionWidget, IBi
 
         // when you press the button
         mActionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+			public void onClick(View v) {
                 Intent i = new Intent(getContext(), GeoPointActivity.class);
-                ((Activity)getContext()).startActivityForResult(i,
-                        GlobalConstants.LOCATION_CAPTURE);
+                ((Activity) getContext()).startActivityForResult(i,
+                    FormEntryActivity.LOCATION_CAPTURE);
 
             }
         });
@@ -117,6 +122,7 @@ public class GeoPointWidget extends LinearLayout implements IQuestionWidget, IBi
         addView(mActionButton);
         addView(mAnswerDisplay);
     }
+
 
     private String formatGps(double coordinates, String type) {
         String location = Double.toString(coordinates);
@@ -134,33 +140,38 @@ public class GeoPointWidget extends LinearLayout implements IQuestionWidget, IBi
         if (type.equalsIgnoreCase("lon")) {
             if (degree.startsWith("-")) {
                 degree = "W " + degree.replace("-", "") + mins + secs;
-            }
-            else
+            } else
                 degree = "E " + degree.replace("-", "") + mins + secs;
-        }
-        else {
+        } else {
             if (degree.startsWith("-")) {
                 degree = "S " + degree.replace("-", "") + mins + secs;
-            }
-            else
+            } else
                 degree = "N " + degree.replace("-", "") + mins + secs;
         }
         return degree;
     }
 
-    public void setFocus(Context context) {
+
+    @Override
+	public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 
-    public void setBinaryData(Object answer) {
-        String s = (String)answer;
+
+    @Override
+	public void setBinaryData(Object answer) {
+        String s = (String) answer;
         mStringAnswer.setText(s);
 
         String[] sa = s.split(" ");
-        mAnswerDisplay.setText("Latitude: " + formatGps(Double.parseDouble(sa[0]), "lat") + "\nLongitude: "
-                + formatGps(Double.parseDouble(sa[1]), "lon") + "\nAltitude: " + sa[2] + "m\nAccuracy: " + sa[3] + "m");
+        mAnswerDisplay.setText(getContext().getString(R.string.latitude) + ": "
+                + formatGps(Double.parseDouble(sa[0]), "lat") + "\n"
+                + getContext().getString(R.string.longitude) + ": "
+                + formatGps(Double.parseDouble(sa[1]), "lon") + "\n"
+                + getContext().getString(R.string.altitude) + ": " + sa[2] + "\n"
+                + getContext().getString(R.string.accuracy) + ": " + sa[3] + "m");
     }
 }

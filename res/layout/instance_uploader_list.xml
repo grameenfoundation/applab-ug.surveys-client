@@ -24,25 +24,24 @@ the License.
     android:orientation="horizontal"
     android:layout_alignParentBottom="true"
     android:id="@+id/buttonholder">
-        <!-- 
-    <ToggleButton 
+         
+    <Button 
      android:id="@+id/toggle_button"
-     android:textOn="@string/toggle_selected"
-     android:textOff="@string/toggle_selected"
-    android:layout_width="wrap_content"
+     android:text="@string/toggle_selected"
+     android:layout_width="wrap_content"
      android:layout_height="wrap_content"
-     android:padding="15px"
-     android:textSize="19px" 
-android:layout_weight="1" 
-     /> -->
+     android:padding="12dp"
+     android:textSize="16dp" 
+	 android:layout_weight="1" 
+     />
      
     <Button 
      android:id="@+id/upload_button"
      android:text="@string/send_selected_data"
       android:layout_width="wrap_content"
      android:layout_height="wrap_content"
-     android:padding="15px"
-     android:textSize="19px" 
+     android:padding="12dp"
+     android:textSize="16dp" 
 android:layout_weight="1"      />
     
   </LinearLayout>
@@ -58,9 +57,9 @@ android:layout_weight="1"      />
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:text="@string/no_items_display"
-    android:textSize="16px"
-    android:paddingLeft="20px"
-    android:paddingRight="20px"
+    android:textSize="19dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
     android:gravity="center"
     android:background="@drawable/white"
     android:textColor="@drawable/black" />

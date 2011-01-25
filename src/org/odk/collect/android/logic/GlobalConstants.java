@@ -70,21 +70,6 @@ public class GlobalConstants {
     public static final String VALID_FILENAME = "[ _\\-A-Za-z0-9]*.x[ht]*ml";
 
     /**
-     * Forms storage path
-     */
-    public static final String FORMS_PATH = "/sdcard/odk/forms/";
-
-    /**
-     * Instances storage path
-     */
-    public static final String INSTANCES_PATH = "/sdcard/odk/instances/";
-
-    /**
-     * Temp path
-     */
-    public static final String CACHE_PATH = "/sdcard/odk/.cache/";
-
-    /**
      * Identifies the location of the form used to launch form entry
      */
     public static final String KEY_FORMPATH = "formpath";
@@ -96,11 +81,6 @@ public class GlobalConstants {
      * How long to wait when opening network connection in milliseconds
      */
     public static final int CONNECTION_TIMEOUT = 30000;
-
-    /**
-     * Temporary file
-     */
-    public static final String TMPFILE_PATH = CACHE_PATH + "tmp.jpg";
 
     /**
      * Theme used in entire application

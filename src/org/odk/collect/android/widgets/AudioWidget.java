@@ -1,16 +1,14 @@
 /*
  * Copyright (C) 2009 University of Washington
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
@@ -20,8 +18,9 @@ import java.io.File;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.views.QuestionView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -61,21 +60,24 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
     private int mReplaceText;
     private int mPlayText;
 
+
     public AudioWidget(Context context, String instancePath) {
         super(context);
         initialize(instancePath);
     }
+
 
     private void initialize(String instancePath) {
         mInstanceFolder = instancePath.substring(0, instancePath.lastIndexOf("/") + 1);
 
         mExternalUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         mCaptureIntent = android.provider.MediaStore.Audio.Media.RECORD_SOUND_ACTION;
-        mRequestCode = GlobalConstants.AUDIO_CAPTURE;
+        mRequestCode = FormEntryActivity.AUDIO_CAPTURE;
         mCaptureText = R.string.capture_audio;
         mReplaceText = R.string.replace_audio;
         mPlayText = R.string.play_audio;
     }
+
 
     private void deleteMedia() {
         // get the file path and delete the file
@@ -88,7 +90,9 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         mBinaryName = null;
     }
 
-    public void clearAnswer() {
+
+    @Override
+	public void clearAnswer() {
         // remove the file
         deleteMedia();
 
@@ -98,32 +102,36 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         mDisplayText.setText(getContext().getString(R.string.no_capture));
     }
 
-    public IAnswerData getAnswer() {
+
+    @Override
+	public IAnswerData getAnswer() {
         if (mBinaryName != null) {
             return new StringData(mBinaryName.toString());
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    public void buildView(PromptElement prompt) {
+
+    @Override
+	public void buildView(FormEntryPrompt prompt) {
         setOrientation(LinearLayout.VERTICAL);
 
         // setup capture button
         mCaptureButton = new Button(getContext());
         mCaptureButton.setText(getContext().getString(mCaptureText));
         mCaptureButton
-                .setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+                .setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mCaptureButton.setPadding(20, 20, 20, 20);
         mCaptureButton.setEnabled(!prompt.isReadOnly());
 
         // launch capture intent on click
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+			public void onClick(View v) {
                 Intent i = new Intent(mCaptureIntent);
                 i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mExternalUri.toString());
-                ((Activity)getContext()).startActivityForResult(i, mRequestCode);
+                ((Activity) getContext()).startActivityForResult(i, mRequestCode);
 
             }
         });
@@ -131,16 +139,17 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         // setup play button
         mPlayButton = new Button(getContext());
         mPlayButton.setText(getContext().getString(mPlayText));
-        mPlayButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+        mPlayButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mPlayButton.setPadding(20, 20, 20, 20);
 
         // on play, launch the appropriate viewer
         mPlayButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+			public void onClick(View v) {
                 Intent i = new Intent("android.intent.action.VIEW");
                 File f = new File(mInstanceFolder + "/" + mBinaryName);
                 i.setDataAndType(Uri.fromFile(f), "audio/*");
-                ((Activity)getContext()).startActivity(i);
+                ((Activity) getContext()).startActivity(i);
 
             }
         });
@@ -154,8 +163,7 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
             mPlayButton.setEnabled(true);
             mCaptureButton.setText(getContext().getString(mReplaceText));
             mDisplayText.setText(getContext().getString(R.string.one_capture));
-        }
-        else {
+        } else {
             mPlayButton.setEnabled(false);
             mDisplayText.setText(getContext().getString(R.string.no_capture));
         }
@@ -166,11 +174,12 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
 
     }
 
+
     private Uri getUriFromPath(String path) {
         // find entry in content provider
         Cursor c =
-                getContext().getContentResolver().query(mExternalUri, null, "_data='" + path + "'",
-                        null, null);
+            getContext().getContentResolver().query(mExternalUri, null, "_data='" + path + "'",
+                null, null);
         c.moveToFirst();
 
         // create uri from path
@@ -178,6 +187,7 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         c.close();
         return Uri.parse(newPath);
     }
+
 
     private String getPathFromUri(Uri uri) {
         // find entry in content provider
@@ -190,14 +200,16 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         return colString;
     }
 
-    public void setBinaryData(Object binaryuri) {
+
+    @Override
+	public void setBinaryData(Object binaryuri) {
         // you are replacing an answer. remove the media.
         if (mBinaryName != null) {
             deleteMedia();
         }
 
         // get the file path and move the file
-        String binarypath = getPathFromUri((Uri)binaryuri);
+        String binarypath = getPathFromUri((Uri) binaryuri);
         File f = new File(binarypath);
         String s = mInstanceFolder + "/" + binarypath.substring(binarypath.lastIndexOf('/') + 1);
         if (!f.renameTo(new File(s))) {
@@ -209,10 +221,12 @@ public class AudioWidget extends LinearLayout implements IQuestionWidget, IBinar
         mBinaryName = s.substring(s.lastIndexOf('/') + 1);
     }
 
-    public void setFocus(Context context) {
+
+    @Override
+	public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

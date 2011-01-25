@@ -1,16 +1,14 @@
 /*
  * Copyright (C) 2009 University of Washington
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
@@ -18,8 +16,9 @@ package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.views.QuestionView;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -45,55 +44,60 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
     private Button mActionButton;
     private TextView mStringAnswer;
 
+
     public BarcodeWidget(Context context) {
         super(context);
     }
 
-    public void clearAnswer() {
+
+    @Override
+	public void clearAnswer() {
         mStringAnswer.setText(null);
         mActionButton.setText(getContext().getString(R.string.get_barcode));
-
     }
 
-    public IAnswerData getAnswer() {
+
+    @Override
+	public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        }
-        else {
+        } else {
             return new StringData(s);
         }
     }
 
-    public void buildView(PromptElement prompt) {
+
+    @Override
+	public void buildView(FormEntryPrompt prompt) {
         setOrientation(LinearLayout.VERTICAL);
 
         // set button formatting
         mActionButton = new Button(getContext());
         mActionButton.setText(getContext().getString(R.string.get_barcode));
-        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mActionButton.setPadding(20, 20, 20, 20);
         mActionButton.setEnabled(!prompt.isReadOnly());
 
         // launch barcode capture intent on click
         mActionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+			public void onClick(View v) {
                 Intent i = new Intent("com.google.zxing.client.android.SCAN");
                 try {
-                    ((Activity)getContext()).startActivityForResult(i,
-                            GlobalConstants.BARCODE_CAPTURE);
-                }
-                catch (ActivityNotFoundException e) {
+                    ((Activity) getContext()).startActivityForResult(i,
+                        FormEntryActivity.BARCODE_CAPTURE);
+                } catch (ActivityNotFoundException e) {
                     Toast.makeText(getContext(),
-                            getContext().getString(R.string.barcode_scanner_error),
-                            Toast.LENGTH_SHORT).show();
+                        getContext().getString(R.string.barcode_scanner_error), Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
         });
 
         // set text formatting
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+        mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mStringAnswer.setGravity(Gravity.CENTER);
 
         String s = prompt.getAnswerText();
@@ -106,17 +110,21 @@ public class BarcodeWidget extends LinearLayout implements IQuestionWidget, IBin
         addView(mStringAnswer);
     }
 
+
     /**
      * Allows answer to be set externally in {@Link FormEntryActivity}.
      */
-    public void setBinaryData(Object answer) {
-        mStringAnswer.setText((String)answer);
+    @Override
+	public void setBinaryData(Object answer) {
+        mStringAnswer.setText((String) answer);
     }
 
-    public void setFocus(Context context) {
+
+    @Override
+	public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 

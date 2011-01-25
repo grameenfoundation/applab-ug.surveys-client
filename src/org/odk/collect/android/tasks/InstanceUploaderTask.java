@@ -1,24 +1,18 @@
 /*
  * Copyright (C) 2009 University of Washington
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
 package org.odk.collect.android.tasks;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -33,31 +27,35 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.odk.collect.android.activities.InstanceUploaderList;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.logic.GlobalConstants;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import applab.client.HttpHelpers;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 /**
  * Background task for uploading completed forms.
  * 
  * @author Carl Hartung (carlhartung@gmail.com)
- * 
  */
 public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<String>> {
 
-    public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
-    
     private static String t = "InstanceUploaderTask";
-    private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
+    //private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
     String mUrl;
-    String imei;
+    private static final int CONNECTION_TIMEOUT = 30000;
+
+    public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
+    
 
     public void setUploadServer(String newServer) {
         mUrl = newServer;
     }
+
 
     @Override
     protected ArrayList<String> doInBackground(String... values) {
@@ -69,13 +67,12 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
             // configure connection
             HttpParams params = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(params, GlobalConstants.CONNECTION_TIMEOUT);
-            HttpConnectionParams.setSoTimeout(params, GlobalConstants.CONNECTION_TIMEOUT);
+            HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+            HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
             HttpClientParams.setRedirecting(params, false);
 
             // setup client
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
-
             HttpPost httppost = new HttpPost(mUrl);
             HttpHelpers.addCommonHeaders(httppost);
 
@@ -103,45 +100,25 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
                 FileBody fb;
                 if (f.getName().endsWith(".xml")) {
                     fb = new FileBody(f, "text/xml");
-                    if (fb.getContentLength() <= MAX_BYTES) {
-                        entity.addPart("xml_submission_file", fb);
-                        Log.i(t, "added xml file " + f.getName());
-                    }
-                    else {
-                        Log.i(t, "file " + f.getName() + " is too big");
-                    }
-                }
-                else if (f.getName().endsWith(".jpg")) {
+                    entity.addPart("xml_submission_file", fb);
+                    Log.i(t, "added xml file " + f.getName());
+                } else if (f.getName().endsWith(".jpg")) {
                     fb = new FileBody(f, "image/jpeg");
-                    if (fb.getContentLength() <= MAX_BYTES) {
-                        entity.addPart(f.getName(), fb);
-                        Log.i(t, "added image file " + f.getName());
-                    }
-                    else {
-                        Log.i(t, "file " + f.getName() + " is too big");
-                    }
-                }
-                else if (f.getName().endsWith(".3gpp")) {
+                    entity.addPart(f.getName(), fb);
+                    Log.i(t, "added image file " + f.getName());
+                } else if (f.getName().endsWith(".3gpp")) {
                     fb = new FileBody(f, "audio/3gpp");
-                    if (fb.getContentLength() <= MAX_BYTES) {
-                        entity.addPart(f.getName(), fb);
-                        Log.i(t, "added audio file " + f.getName());
-                    }
-                    else {
-                        Log.i(t, "file " + f.getName() + " is too big");
-                    }
-                }
-                else if (f.getName().endsWith(".3gp")) {
+                    entity.addPart(f.getName(), fb);
+                    Log.i(t, "added audio file " + f.getName());
+                } else if (f.getName().endsWith(".3gp")) {
                     fb = new FileBody(f, "video/3gpp");
-                    if (fb.getContentLength() <= MAX_BYTES) {
-                        entity.addPart(f.getName(), fb);
-                        Log.i(t, "added video file " + f.getName());
-                    }
-                    else {
-                        Log.i(t, "file " + f.getName() + " is too big");
-                    }
-                }
-                else {
+                    entity.addPart(f.getName(), fb);
+                    Log.i(t, "added video file " + f.getName());
+                } else if (f.getName().endsWith(".mp4")) {
+                    fb = new FileBody(f, "video/mp4");
+                    entity.addPart(f.getName(), fb);
+                    Log.i(t, "added video file " + f.getName());
+                 } else {
                     Log.w(t, "unsupported file type, not adding file: " + f.getName());
                 }
             }
@@ -151,16 +128,13 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             HttpResponse response = null;
             try {
                 response = httpclient.execute(httppost);
-            }
-            catch (ClientProtocolException e) {
+            } catch (ClientProtocolException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
                 return uploadedIntances;
             }
@@ -171,8 +145,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             Header[] h = response.getHeaders("Location");
             if (h != null && h.length > 0) {
                 serverLocation = h[0].getValue();
-            }
-            else {
+            } else {
                 // something should be done here...
                 Log.e(t, "Location header was absent");
             }
@@ -189,6 +162,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
         return uploadedIntances;
     }
 
+
     @Override
     protected void onPostExecute(ArrayList<String> value) {
         synchronized (this) {
@@ -197,6 +171,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
+
 
     @Override
     protected void onProgressUpdate(Integer... values) {
@@ -207,6 +182,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
+
 
     public void setUploaderListener(InstanceUploaderListener sl) {
         synchronized (this) {

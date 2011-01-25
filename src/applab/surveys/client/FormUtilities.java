@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.odk.collect.android.database.FileDbAdapter;
-import org.odk.collect.android.logic.GlobalConstants;
+import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -67,7 +67,7 @@ public class FormUtilities {
     public static List<String> getInstanceFormDefs(Context context) {
         List<String> instanceFormDefs = new ArrayList<String>();
 
-        FileDbAdapter fda = new FileDbAdapter(context);
+        FileDbAdapter fda = new FileDbAdapter();
         fda.open();
 
         Cursor cursor = fda.fetchFilesByType(FileDbAdapter.TYPE_INSTANCE, null);
@@ -102,8 +102,8 @@ public class FormUtilities {
         String formName = pattern.split(instancePath)[0];
         formName = formName.substring(formName.lastIndexOf("/") + 1);
 
-        File xmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xml");
-        File xhtmlFile = new File(GlobalConstants.FORMS_PATH + "/" + formName + ".xhtml");
+        File xmlFile = new File(FileUtils.FORMS_PATH + "/" + formName + ".xml");
+        File xhtmlFile = new File(FileUtils.FORMS_PATH + "/" + formName + ".xhtml");
 
         // form is either xml or xhtml file. find the appropriate one.
         if (xmlFile.exists()) {

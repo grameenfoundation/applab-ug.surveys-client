@@ -1,16 +1,14 @@
 /*
  * Copyright (C) 2009 University of Washington
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
@@ -18,17 +16,17 @@ package org.odk.collect.android.widgets;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.odk.collect.android.logic.GlobalConstants;
-import org.odk.collect.android.logic.PromptElement;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.views.QuestionView;
 
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 import applab.surveys.client.R;
 
 /**
@@ -38,66 +36,63 @@ import applab.surveys.client.R;
  */
 public class TriggerWidget extends LinearLayout implements IQuestionWidget {
 
-    private ToggleButton mActionButton;
+    private CheckBox mActionButton;
     private TextView mStringAnswer;
-    private TextView mDisplayText;
-    private String yes = "yes";
-    private String no = "no";
+    private static String mOK = "OK";
 
     public TriggerWidget(Context context) {
         super(context);
     }
 
-    public void clearAnswer() {
+
+    @Override
+	public void clearAnswer() {
         mStringAnswer.setText(null);
         mActionButton.setChecked(false);
     }
 
-    public IAnswerData getAnswer() {
+
+    @Override
+	public IAnswerData getAnswer() {
         String s = mStringAnswer.getText().toString();
         if (s == null || s.equals("")) {
             return null;
-        }
-        else {
+        } else {
             return new StringData(s);
         }
     }
 
-    public void buildView(PromptElement prompt) {
+
+    @Override
+	public void buildView(FormEntryPrompt prompt) {
         this.setOrientation(LinearLayout.VERTICAL);
 
-        mActionButton = new ToggleButton(getContext());
-        mActionButton.setText(getContext().getString(R.string.ack));
-        mActionButton.setTextOff(getContext().getString(R.string.ack));
-        mActionButton.setTextOn(getContext().getString(R.string.acked));
-        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
-        mActionButton.setPadding(20, 20, 20, 20);
+        mActionButton = new CheckBox(getContext());
+        mActionButton.setText(getContext().getString(R.string.trigger));
+        mActionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
+        //mActionButton.setPadding(20, 20, 20, 20);
         mActionButton.setEnabled(!prompt.isReadOnly());
 
         mActionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (TriggerWidget.this.mActionButton.isChecked()) {
-                    TriggerWidget.this.mStringAnswer.setText(yes);
-                }
-                else {
-                    TriggerWidget.this.mStringAnswer.setText(no);
+            @Override
+			public void onClick(View v) {
+                if (mActionButton.isChecked()) {
+                    mStringAnswer.setText(mOK);
+                } else {
+                    mStringAnswer.setText(null);
                 }
             }
         });
 
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_PX, GlobalConstants.APPLICATION_FONTSIZE);
+        mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, QuestionView.APPLICATION_FONTSIZE);
         mStringAnswer.setGravity(Gravity.CENTER);
-
-        mDisplayText = new TextView(getContext());
-        mDisplayText.setPadding(5, 0, 0, 0);
 
         String s = prompt.getAnswerText();
         if (s != null) {
-            if (s.equals(yes)) {
+            if (s.equals(mOK)) {
                 mActionButton.setChecked(true);
-            }
-            else {
+            } else {
                 mActionButton.setChecked(false);
             }
             mStringAnswer.setText(s);
@@ -106,13 +101,15 @@ public class TriggerWidget extends LinearLayout implements IQuestionWidget {
 
         // finish complex layout
         this.addView(mActionButton);
-        // this.addView(mStringAnswer);
+       // this.addView(mStringAnswer);
     }
 
-    public void setFocus(Context context) {
+
+    @Override
+	public void setFocus(Context context) {
         // Hide the soft keyboard if it's showing.
         InputMethodManager inputManager =
-                (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
     }
 }
