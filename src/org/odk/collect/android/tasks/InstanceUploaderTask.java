@@ -84,6 +84,10 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             httppost.addHeader(SURVEY_LOCATION_HEADER, location);
             
             String path = locationAndPath.substring(locationSeparatorPos + 1);
+            
+            //Restore original path by removing the location.
+            values[i] = path;
+            
             File file = new File(path);
 
             // find all files in parent directory
