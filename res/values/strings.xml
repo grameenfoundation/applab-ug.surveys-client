@@ -145,7 +145,7 @@
 <string name="url_error">Sorry, invalid URL!</string>
 <string name="username">Username</string>
 <string name="view_hierarchy">Go To Prompt</string>
-<integer name="app_version_code">20110125</integer> <!-- This is pulled into the manifest. It must be an integer and must increment for each new version (best way is to use the release date in YYYYMMDD format) -->
+<integer name="app_version_code">20110127</integer> <!-- This is pulled into the manifest. It must be an integer and must increment for each new version (best way is to use the release date in YYYYMMDD format) -->
 <string name="app_name">CKW Surveys</string>
-<string name="app_version">2.11-pre2 [ODK 1.1.5]</string>
+<string name="app_version">2.11-pre3 [ODK 1.1.5]</string>
 </resources>

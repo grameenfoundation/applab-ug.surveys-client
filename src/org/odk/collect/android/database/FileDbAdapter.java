@@ -78,11 +78,11 @@ public class FileDbAdapter {
     private static final String DATABASE_CREATE =
         "create table IF NOT EXISTS files (_id integer primary key autoincrement, " + "path text not null, "
         + "hash text not null, " + "type text not null, " + "status text not null, "
-        + "display text not null, " + "meta text not null);";
+        + "display text not null, " + "meta text not null, " + "location text);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "files";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory()
     + "/odk/metadata";
 
@@ -99,6 +99,17 @@ public class FileDbAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            // Assumes first install, but sometimes it seems db from previous uninstall may be lying around
+            dropTables(db);
+            createTables(db);
+        }
+
+
+        /**
+         * @param db
+         * @throws SQLException
+         */
+        public void createTables(SQLiteDatabase db) throws SQLException {
             db.execSQL(DATABASE_CREATE);
         }
 
@@ -106,18 +117,18 @@ public class FileDbAdapter {
         @Override
         // upgrading will destroy all old data
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            String sqlStatement = "DROP TABLE IF EXISTS " + DATABASE_TABLE;
-
-            if(DATABASE_VERSION == 2){
-                sqlStatement = "ALTER TABLE " + DATABASE_TABLE + " ADD " + KEY_LOCATION + " TEXT";
+            if(newVersion == 3) {
+                db.execSQL("ALTER TABLE " + DATABASE_TABLE + " ADD " + KEY_LOCATION + " TEXT");
             }
-
-            db.execSQL(sqlStatement);
-            onCreate(db);
+            
+            createTables(db);
+        }
+        
+        private  void dropTables(SQLiteDatabase db) {
+            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
         }
     }
-
-
+    
     public FileDbAdapter() {
     }
 
