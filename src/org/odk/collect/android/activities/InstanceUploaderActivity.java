@@ -103,14 +103,21 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         Intent in = new Intent();
         in.putExtra(FormEntryActivity.KEY_SUCCESS, success);
         setResult(RESULT_OK, in);
-
-        // for each path, update the status
-        FileDbAdapter fda = new FileDbAdapter();
-        fda.open();
-        for (int i = 0; i < resultSize; i++) {
-            fda.updateFile(result.get(i), FileDbAdapter.STATUS_SUBMITTED);
-        }
-        fda.close();
+        
+        // Commenting out the code below so submitted data is automatically removed and
+        // doesn't just sit around on the device till a manual delete.
+        // Linked issue: ZBR-84
+        /*
+         * // for each path, update the status FileDbAdapter fda = new FileDbAdapter(this); fda.open(); for (int i = 0;
+         * i < resultSize; i++) { fda.updateFile(result.get(i), FileDbAdapter.STATUS_SUBMITTED); } fda.close();
+         */
+        // Delete submitted data from database and then remove the data from sd
+        FileDbAdapter fileDbAdapter = new FileDbAdapter();
+        fileDbAdapter.open();
+        fileDbAdapter.deleteFiles(result);
+        fileDbAdapter.removeOrphanInstances(this);
+        fileDbAdapter.close();
+        
         finish();
     }
 

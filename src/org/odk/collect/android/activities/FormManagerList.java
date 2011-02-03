@@ -358,7 +358,7 @@ public class FormManagerList extends ListActivity {
      */
     public static String getFormPathFromInstancePath(String instancePath) {
         // trim the farmer id and timestamp
-        String regex = "\\_\\[[a-zA-Z]{2}[0-9]{4,5}+\\]\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
+        String regex = "\\_(\\[[a-zA-Z]{2}[0-9]{4,5}+\\]|\\[TEST\\])\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
         Pattern pattern = Pattern.compile(regex);
         String formName = pattern.split(instancePath)[0];
         formName = formName.substring(formName.lastIndexOf("/") + 1);
