@@ -14,6 +14,10 @@
 
 package org.odk.collect.android.tasks;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -27,20 +31,11 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.odk.collect.android.activities.InstanceUploaderList;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.preferences.ServerPreferences;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import applab.client.ApplabActivity;
 import applab.client.HttpHelpers;
 import applab.client.farmerregistration.FarmerRegistrationController;
-import applab.surveys.client.R;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Background task for uploading completed forms.
@@ -50,25 +45,27 @@ import java.util.ArrayList;
 public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<String>> {
 
     private static String t = "InstanceUploaderTask";
-    //private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
+    // private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
     String mUrl;
     private static final int CONNECTION_TIMEOUT = 30000;
 
     public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
-    
 
     public void setUploadServer(String newServer) {
         mUrl = newServer;
     }
 
-
     @Override
     protected ArrayList<String> doInBackground(String... values) {
         // First post any pending farmerRegistrations
         FarmerRegistrationController farmerRegController = new FarmerRegistrationController();
-        farmerRegController.postFarmerRegistrationData(mUrl.replace("/submission", "")); // TODO: Need better way of getting/setting the URL. Can't FarmerRegistrationController take care of it?
-        
+        farmerRegController.postFarmerRegistrationData(mUrl.replace("/submission", "")); // TODO: Need better way of
+                                                                                         // getting/setting the URL.
+                                                                                         // Can't
+                                                                                         // FarmerRegistrationController
+                                                                                         // take care of it?
+
         ArrayList<String> uploadedIntances = new ArrayList<String>();
         int instanceCount = values.length;
 
@@ -88,16 +85,16 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
             // get location and instance file
             String locationAndPath = values[i];
-            
+
             int locationSeparatorPos = locationAndPath.indexOf(InstanceUploaderList.LOCATION_SEPARATOR);
             String location = locationAndPath.substring(0, locationSeparatorPos);
             httppost.addHeader(SURVEY_LOCATION_HEADER, location);
-            
+
             String path = locationAndPath.substring(locationSeparatorPos + 1);
-            
-            //Restore original path by removing the location.
+
+            // Restore original path by removing the location.
             values[i] = path;
-            
+
             File file = new File(path);
 
             // find all files in parent directory
@@ -116,23 +113,28 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
                     fb = new FileBody(f, "text/xml");
                     entity.addPart("xml_submission_file", fb);
                     Log.i(t, "added xml file " + f.getName());
-                } else if (f.getName().endsWith(".jpg")) {
+                }
+                else if (f.getName().endsWith(".jpg")) {
                     fb = new FileBody(f, "image/jpeg");
                     entity.addPart(f.getName(), fb);
                     Log.i(t, "added image file " + f.getName());
-                } else if (f.getName().endsWith(".3gpp")) {
+                }
+                else if (f.getName().endsWith(".3gpp")) {
                     fb = new FileBody(f, "audio/3gpp");
                     entity.addPart(f.getName(), fb);
                     Log.i(t, "added audio file " + f.getName());
-                } else if (f.getName().endsWith(".3gp")) {
+                }
+                else if (f.getName().endsWith(".3gp")) {
                     fb = new FileBody(f, "video/3gpp");
                     entity.addPart(f.getName(), fb);
                     Log.i(t, "added video file " + f.getName());
-                } else if (f.getName().endsWith(".mp4")) {
+                }
+                else if (f.getName().endsWith(".mp4")) {
                     fb = new FileBody(f, "video/mp4");
                     entity.addPart(f.getName(), fb);
                     Log.i(t, "added video file " + f.getName());
-                 } else {
+                }
+                else {
                     Log.w(t, "unsupported file type, not adding file: " + f.getName());
                 }
             }
@@ -142,13 +144,16 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             HttpResponse response = null;
             try {
                 response = httpclient.execute(httppost);
-            } catch (ClientProtocolException e) {
+            }
+            catch (ClientProtocolException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
                 return uploadedIntances;
-            } catch (IllegalStateException e) {
+            }
+            catch (IllegalStateException e) {
                 e.printStackTrace();
                 return uploadedIntances;
             }
@@ -159,7 +164,8 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             Header[] h = response.getHeaders("Location");
             if (h != null && h.length > 0) {
                 serverLocation = h[0].getValue();
-            } else {
+            }
+            else {
                 // something should be done here...
                 Log.e(t, "Location header was absent");
             }
@@ -176,7 +182,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
         return uploadedIntances;
     }
 
-
     @Override
     protected void onPostExecute(ArrayList<String> value) {
         synchronized (this) {
@@ -185,7 +190,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
-
 
     @Override
     protected void onProgressUpdate(Integer... values) {
@@ -196,7 +200,6 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
         }
     }
-
 
     public void setUploaderListener(InstanceUploaderListener sl) {
         synchronized (this) {
