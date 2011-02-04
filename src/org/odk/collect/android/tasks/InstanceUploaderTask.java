@@ -36,7 +36,6 @@ import android.util.Log;
 import applab.client.ApplabActivity;
 import applab.client.HttpHelpers;
 import applab.client.farmerregistration.FarmerRegistrationController;
-import applab.search.client.Settings;
 import applab.surveys.client.R;
 
 import java.io.File;
