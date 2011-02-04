@@ -27,10 +27,17 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.odk.collect.android.activities.InstanceUploaderList;
 import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.preferences.ServerPreferences;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import applab.client.ApplabActivity;
 import applab.client.HttpHelpers;
+import applab.client.farmerregistration.FarmerRegistrationController;
+import applab.search.client.Settings;
+import applab.surveys.client.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +66,10 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
     @Override
     protected ArrayList<String> doInBackground(String... values) {
+        // First post any pending farmerRegistrations
+        FarmerRegistrationController farmerRegController = new FarmerRegistrationController();
+        farmerRegController.postFarmerRegistrationData(mUrl.replace("/submission", "")); // TODO: Need better way of getting/setting the URL. Can't FarmerRegistrationController take care of it?
+        
         ArrayList<String> uploadedIntances = new ArrayList<String>();
         int instanceCount = values.length;
 
