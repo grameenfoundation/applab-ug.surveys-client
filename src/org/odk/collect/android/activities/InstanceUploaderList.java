@@ -44,7 +44,7 @@ import applab.surveys.client.R;
 // TODO long click form for submission log
 public class InstanceUploaderList extends ListActivity {
     
-    public static char LOCATION_SEPARATOR = '|';
+    public static String PARAMETER_SEPARATOR = "|";
 
     private static final String BUNDLE_SELECTED_ITEMS_KEY = "selected_items";
     private static final String BUNDLE_TOGGLED_KEY = "toggled";
@@ -171,7 +171,8 @@ public class InstanceUploaderList extends ListActivity {
             startManagingCursor(c);
             String path = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
             String location = c.getString(c.getColumnIndex(FileDbAdapter.KEY_LOCATION));
-            selectedInstances.add(location + LOCATION_SEPARATOR + path);
+            String intervieweeId = c.getString(c.getColumnIndex(FileDbAdapter.KEY_INTERVIEWEE));
+            selectedInstances.add(intervieweeId + PARAMETER_SEPARATOR + location + PARAMETER_SEPARATOR + path);
         }
 
         // bundle intent with upload files

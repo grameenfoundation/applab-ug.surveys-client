@@ -112,7 +112,7 @@ public class InstanceChooserList extends ListActivity {
      */
     private String getFormPathFromInstancePath(String instancePath) {
      // trim the timestamp
-        String regex = "\\_\\[(.*)\\]\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
+        String regex = "\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
         Pattern pattern = Pattern.compile(regex);
         String formName = pattern.split(instancePath)[0];
         formName = formName.substring(formName.lastIndexOf("/") + 1);

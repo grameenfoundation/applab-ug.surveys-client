@@ -14,6 +14,14 @@
 
 package org.odk.collect.android.database;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.regex.Pattern;
+
+import org.odk.collect.android.logic.GlobalConstants;
 import org.odk.collect.android.utilities.FileUtils;
 
 import android.content.ContentValues;
@@ -27,13 +35,6 @@ import android.os.Environment;
 import android.provider.MediaStore.Images;
 import android.util.Log;
 import applab.client.location.GpsManager;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.regex.Pattern;
 
 /**
  * Manages the files the application uses.
@@ -54,6 +55,7 @@ public class FileDbAdapter {
     public static final String KEY_DISPLAY = "display";
     public static final String KEY_META = "meta";
     public static final String KEY_LOCATION = "location";
+    public static final String KEY_INTERVIEWEE = "interviewee";
 
     // file types
     public static final String TYPE_FORM = "form";
@@ -76,13 +78,19 @@ public class FileDbAdapter {
     private SQLiteDatabase mDb;
 
     private static final String DATABASE_CREATE =
-        "create table IF NOT EXISTS files (_id integer primary key autoincrement, " + "path text not null, "
-        + "hash text not null, " + "type text not null, " + "status text not null, "
-        + "display text not null, " + "meta text not null, " + "location text);";
+        "create table IF NOT EXISTS files (_id integer primary key autoincrement, "
+            + "path text not null, "
+            + "hash text not null, "
+            + "type text not null, "
+            + "status text not null, "
+            + "display text not null, "
+            + "meta text not null, "
+            + "location text, "
+            + "interviewee text);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "files";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory()
     + "/odk/metadata";
 
@@ -119,6 +127,9 @@ public class FileDbAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if(newVersion == 3) {
                 db.execSQL("ALTER TABLE " + DATABASE_TABLE + " ADD " + KEY_LOCATION + " TEXT");
+            }
+            else if (newVersion == 4) {
+                db.execSQL("ALTER TABLE " + DATABASE_TABLE + " ADD " + KEY_INTERVIEWEE + " TEXT");
             }
             
             createTables(db);
@@ -181,7 +192,7 @@ public class FileDbAdapter {
 
         if (type.equals(TYPE_INSTANCE)) {
             // remove time stamp from instance
-            String r = "\\_\\[(.*)\\]\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
+            String r = "\\_[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}\\_[0-9]{2}\\-[0-9]{2}\\-[0-9]{2}\\.xml$";
             Pattern p = Pattern.compile(r);
             return p.split(filename)[0] + " " + "Data";
         } else if (type.equals(TYPE_FORM)) {
@@ -225,6 +236,9 @@ public class FileDbAdapter {
 
         //add the location from where the form was filled/saved
         cv.put(KEY_LOCATION, GpsManager.getInstance().getLocationAsString());
+
+        // Add the interviewee id to the db
+        cv.put(KEY_INTERVIEWEE, GlobalConstants.intervieweeName);
 
         long id = -1;
         try {
@@ -314,7 +328,7 @@ public class FileDbAdapter {
 
     public Cursor fetchFile(long id) throws SQLException {
         Cursor c = mDb.query(true, DATABASE_TABLE, new String[] {
-                KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META, KEY_LOCATION
+                KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META, KEY_LOCATION, KEY_INTERVIEWEE
         }, KEY_ID + "='" + id + "'", null, null, null, null, null);
 
         if (c != null) {

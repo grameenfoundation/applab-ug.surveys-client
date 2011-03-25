@@ -72,39 +72,44 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
         for (int i = 0; i < instanceCount; i++) {
             publishProgress(i + 1, instanceCount);
 
-            // configure connection
+            // Configure connection
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
             HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
             HttpClientParams.setRedirecting(params, false);
 
-            // setup client
+            // Setup client
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
             HttpPost httppost = new HttpPost(mUrl);
             HttpHelpers.addCommonHeaders(httppost);
 
-            // get location and instance file
-            String locationAndPath = values[i];
-
-            int locationSeparatorPos = locationAndPath.indexOf(InstanceUploaderList.LOCATION_SEPARATOR);
-            String location = locationAndPath.substring(0, locationSeparatorPos);
+            // Get intervieweeId, location and instance file
+            String parameters = values[i];
+            String[] paramArray = parameters.split(InstanceUploaderList.PARAMETER_SEPARATOR);
+            String intervieweeId = "";
+            String location = "";
+            String path = "";
+            if (paramArray.length == 3) {
+                intervieweeId = paramArray[0];
+                location = paramArray[1];
+                path = paramArray[2];
+            }
+            else {
+                location = paramArray[0];
+                path = paramArray[1];
+            }
             httppost.addHeader(SURVEY_LOCATION_HEADER, location);
-
-            String path = locationAndPath.substring(locationSeparatorPos + 1);
-
-            // Restore original path by removing the location.
-            values[i] = path;
 
             File file = new File(path);
 
-            // find all files in parent directory
+            // Find all files in parent directory
             File[] files = file.getParentFile().listFiles();
             if (files == null) {
                 Log.e(t, "no files to upload");
                 cancel(true);
             }
 
-            // mime post
+            // Mime post
             MultipartEntity entity = new MultipartEntity();
             for (int j = 0; j < files.length; j++) {
                 File f = files[j];
@@ -140,7 +145,11 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             }
             httppost.setEntity(entity);
 
-            // prepare response and return uploaded
+            // Pass the interviewee back as a post variable
+            params.setParameter("intervieweeId", intervieweeId);
+            httppost.setParams(params);
+
+            // Prepare response and return uploaded
             HttpResponse response = null;
             try {
                 response = httpclient.execute(httppost);
