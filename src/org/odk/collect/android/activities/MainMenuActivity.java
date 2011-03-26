@@ -106,7 +106,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ApplabActivity.setAppVersion(getString(R.string.app_version));
+        ApplabActivity.setAppVersion(getString(R.string.app_name), getString(R.string.app_version));
 
         requestWindowFeature(Window.FEATURE_RIGHT_ICON);
         setContentView(R.layout.main_menu);
