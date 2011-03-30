@@ -44,7 +44,7 @@ import applab.surveys.client.R;
 // TODO long click form for submission log
 public class InstanceUploaderList extends ListActivity {
     
-    public static String PARAMETER_SEPARATOR = "|";
+    public static String PARAMETER_SEPARATOR = "@";
 
     private static final String BUNDLE_SELECTED_ITEMS_KEY = "selected_items";
     private static final String BUNDLE_TOGGLED_KEY = "toggled";

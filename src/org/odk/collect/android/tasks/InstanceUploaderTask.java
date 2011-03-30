@@ -90,13 +90,13 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
             String location = "";
             String path = "";
             if (paramArray.length == 3) {
-                intervieweeId = paramArray[0];
-                location = paramArray[1];
-                path = paramArray[2];
+                intervieweeId = paramArray[0].toString().trim();
+                location = paramArray[1].toString().trim();
+                path = paramArray[2].toString().trim();
             }
             else {
-                location = paramArray[0];
-                path = paramArray[1];
+                location = paramArray[0].toString().trim();
+                path = paramArray[1].toString().trim();
             }
             httppost.addHeader(SURVEY_LOCATION_HEADER, location);
 
