@@ -51,6 +51,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
     private static final int CONNECTION_TIMEOUT = 30000;
 
     public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
+    public static final String INTERVIEWEEID_HEADER = "x-applab-interviewee-id";
 
     public void setUploadServer(String newServer) {
         mUrl = newServer;
@@ -99,6 +100,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
                 path = paramArray[1].toString().trim();
             }
             httppost.addHeader(SURVEY_LOCATION_HEADER, location);
+            httppost.addHeader(INTERVIEWEEID_HEADER, intervieweeId);
 
             File file = new File(path);
 
@@ -108,6 +110,9 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
                 Log.e(t, "no files to upload");
                 cancel(true);
             }
+
+            // Restore the path
+            values[i] = path;
 
             // Mime post
             MultipartEntity entity = new MultipartEntity();

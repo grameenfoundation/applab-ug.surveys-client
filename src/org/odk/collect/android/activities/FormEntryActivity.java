@@ -1207,7 +1207,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 mFormPath.substring(mFormPath.lastIndexOf('/') + 1, mFormPath.lastIndexOf('.'));
             String path = FileUtils.INSTANCES_PATH + file + "_" + time;
             if (FileUtils.createFolder(path)) {
-                mInstancePath = path + "/" + file + "_[" + GlobalConstants.intervieweeName + "]_" + time + ".xml";
+                mInstancePath = path + "/" + file + "_" + time + ".xml";
             }
         } else {
             // we've just loaded a saved form, so start in the hierarchy view
