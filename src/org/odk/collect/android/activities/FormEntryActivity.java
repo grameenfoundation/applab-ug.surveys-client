@@ -111,6 +111,8 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
 
     // uncomment when ProgressBar slowdown is fixed.
     // private ProgressBar mProgressBar;
+    
+    private int swipeCounter;
 
     private String mFormPath;
     private String mInstancePath;
@@ -530,17 +532,29 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 case SWIPE_RIGHT:
                     mBeenSwiped = true;
                     showPreviousView();
-                    handled = true;
+                    trackSwipeCount();
+                    handled = true;	
                     break;
                 case SWIPE_LEFT:
                     mBeenSwiped = true;
                     showNextView();
+                    trackSwipeCount();
                     handled = true;
                     break;
             }
         }
         return handled;
     }
+
+
+	private void trackSwipeCount() {
+		this.swipeCounter++;
+		if (this.swipeCounter == 3) {
+			this.swipeCounter = 0;
+			executeSaveToDiskTask(false, false);
+			dismissDialog(SAVING_DIALOG);
+		}
+	}
 
 
     /**
@@ -817,7 +831,12 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             return false;
         }
 
-        mSaveToDiskTask = new SaveToDiskTask();
+        return executeSaveToDiskTask(exit, complete);
+    }
+
+
+	private boolean executeSaveToDiskTask(boolean exit, boolean complete) {
+		mSaveToDiskTask = new SaveToDiskTask();
         mSaveToDiskTask.setFormSavedListener(this);
 
         // TODO remove completion option from db
@@ -829,7 +848,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
         showDialog(SAVING_DIALOG);
 
         return true;
-    }
+	}
 
 
     private void createQuitDialog() {
@@ -1063,7 +1082,10 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      */
     @Override
     protected void onPause() {
+    	//we want to save the form any time the user starts another activity for example camera, hits home button etc
+    	saveDataToDisk(false, false);
         dismissDialogs();
+        dismissDialog(SAVING_DIALOG);
         super.onPause();
     }
 
