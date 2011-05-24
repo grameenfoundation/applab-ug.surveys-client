@@ -25,7 +25,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 public class GeoPointActivity extends Activity implements LocationListener {
 

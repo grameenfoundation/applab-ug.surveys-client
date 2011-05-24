@@ -67,7 +67,7 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * FormEntryActivity is responsible for displaying questions, animating transitions between

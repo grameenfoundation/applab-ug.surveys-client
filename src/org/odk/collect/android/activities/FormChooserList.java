@@ -23,7 +23,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Responsible for displaying all the valid forms in the forms directory. Stores the path to

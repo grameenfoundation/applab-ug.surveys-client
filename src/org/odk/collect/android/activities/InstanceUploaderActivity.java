@@ -30,7 +30,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Activity to upload completed forms.

@@ -27,7 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.

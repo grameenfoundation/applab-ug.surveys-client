@@ -45,7 +45,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Responsible for displaying, adding and deleting all the valid forms in the forms directory.

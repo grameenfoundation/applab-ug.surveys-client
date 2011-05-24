@@ -32,7 +32,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.

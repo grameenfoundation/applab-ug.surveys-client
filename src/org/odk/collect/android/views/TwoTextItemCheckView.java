@@ -19,7 +19,7 @@ import android.util.AttributeSet;
 import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 public class TwoTextItemCheckView extends RelativeLayout implements Checkable {
 

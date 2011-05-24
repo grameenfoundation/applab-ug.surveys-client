@@ -26,7 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * A host activity for {@link InstanceChooserList}.

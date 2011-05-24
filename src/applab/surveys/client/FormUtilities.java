@@ -23,6 +23,7 @@ import org.odk.collect.android.utilities.FileUtils;
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.Toast;
+import applab.client.surveys.R;
 
 /**
  * Utility functions used for managing forms.

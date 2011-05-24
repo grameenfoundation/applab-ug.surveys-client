@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 public class ServerPreferences extends PreferenceActivity implements
         OnSharedPreferenceChangeListener {

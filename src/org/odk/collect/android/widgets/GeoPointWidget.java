@@ -31,7 +31,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * GeoPointWidget is the widget that allows the user to get GPS readings.

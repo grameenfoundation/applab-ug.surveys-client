@@ -40,7 +40,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Widget that allows user to take pictures, sounds or video and add them to the form.

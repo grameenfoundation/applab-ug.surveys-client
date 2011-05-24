@@ -52,7 +52,7 @@ import applab.client.dataconnection.DataConnectionManager;
 import applab.client.farmerregistration.FarmerRegistrationAdapter;
 import applab.client.farmerregistration.FarmerRegistrationController;
 import applab.client.location.GpsManager;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * Responsible for displaying buttons to launch the major activities. Launches some activities based on returns of

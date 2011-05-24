@@ -23,7 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
-import applab.surveys.client.R;
+import applab.client.surveys.R;
 
 /**
  * An example of tab content that launches an activity via
