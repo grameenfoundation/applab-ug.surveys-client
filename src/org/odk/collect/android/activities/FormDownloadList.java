@@ -15,6 +15,8 @@
 package org.odk.collect.android.activities;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -240,6 +242,14 @@ public class FormDownloadList extends ListActivity implements FormDownloaderList
 
     private void buildView() {
         ArrayList<String> formNames = new ArrayList<String>(mFormNamesAndURLs.keySet());
+        
+        class IgnoreStringCaseComparator implements Comparator<String> {
+        	  public int compare(String strA, String strB) {
+        	    return strA.compareToIgnoreCase(strB);
+        	  }
+        	}
+          IgnoreStringCaseComparator iscc = new IgnoreStringCaseComparator();
+          Collections.sort(formNames,iscc);
 
         mFileAdapter =
             new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice,

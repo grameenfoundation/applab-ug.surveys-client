@@ -305,19 +305,19 @@ public class FileDbAdapter {
             // no path given, search using hash
             c = mDb.query(true, DATABASE_TABLE, new String[] {
                     KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
-            }, KEY_HASH + "='" + hash + "'", null, null, null, null, null);
+            }, KEY_HASH + "='" + hash + "'", null, null, null, KEY_DISPLAY, null);
         } else if (hash == null) {
             // no hash given, search using path
             c = mDb.query(true, DATABASE_TABLE, new String[] {
                     KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
-            }, KEY_FILEPATH + "='" + path + "'", null, null, null, null, null);
+            }, KEY_FILEPATH + "='" + path + "'", null, null, null, KEY_DISPLAY, null);
         } else {
             // search using path and hash
             c =
                 mDb.query(true, DATABASE_TABLE, new String[] {
                         KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
                 }, KEY_FILEPATH + "='" + path + "' and " + KEY_HASH + "='" + hash + "'", null,
-                null, null, null, null);
+                null, null, KEY_DISPLAY, null);
         }
         if (c != null) {
             c.moveToFirst();
@@ -354,19 +354,19 @@ public class FileDbAdapter {
             // no type given, search using status
             c = mDb.query(true, DATABASE_TABLE, new String[] {
                     KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
-            }, KEY_STATUS + "='" + status + "'", null, null, null, null, null);
+            }, KEY_STATUS + "='" + status + "'", null, null, null, KEY_DISPLAY, null);
         } else if (status == null) {
             // no status given, search using type
             c = mDb.query(true, DATABASE_TABLE, new String[] {
                     KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
-            }, KEY_TYPE + "='" + type + "'", null, null, null, null, null);
+            }, KEY_TYPE + "='" + type + "'", null, null, null, KEY_DISPLAY, null);
         } else {
             // search using type and status
             c =
                 mDb.query(true, DATABASE_TABLE, new String[] {
                         KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
                 }, KEY_TYPE + "='" + type + "' and " + KEY_STATUS + "='" + status + "'", null,
-                null, null, null, null);
+                null, null, KEY_DISPLAY, null);
         }
 
         if (c != null) {
@@ -382,7 +382,7 @@ public class FileDbAdapter {
         Cursor c = null;
         c = mDb.query(true, DATABASE_TABLE, new String[] {
                 KEY_ID, KEY_FILEPATH, KEY_HASH, KEY_TYPE, KEY_STATUS, KEY_DISPLAY, KEY_META
-        }, null, null, null, null, null, null);
+        }, null, null, null, null, KEY_DISPLAY, null);
 
         if (c != null) {
             c.moveToFirst();
