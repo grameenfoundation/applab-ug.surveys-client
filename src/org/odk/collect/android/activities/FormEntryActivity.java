@@ -1081,9 +1081,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      * @see android.app.Activity#onPause()
      */
     @Override
-    protected void onPause() {
-    	//we want to save the form any time the user starts another activity for example camera, hits home button etc
-    	saveDataToDisk(false, false);
+    protected void onPause() {  	
         dismissDialogs();
         dismissDialog(SAVING_DIALOG);
         super.onPause();
