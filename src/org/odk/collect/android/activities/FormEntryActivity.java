@@ -1082,8 +1082,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
      */
     @Override
     protected void onPause() {  	
-        dismissDialogs();
-        dismissDialog(SAVING_DIALOG);
+        dismissDialogs();        
         super.onPause();
     }
 
