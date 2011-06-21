@@ -13,7 +13,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="applab.surveys.client" android:versionCode="@integer/app_version_code" android:versionName="@string/app_version">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="applab.client.surveys" android:versionCode="@integer/app_version_code" android:versionName="@string/app_version">
   <application android:icon="@drawable/notes" android:label="@string/app_name" android:theme="@android:style/Theme.Light" android:debuggable="true">
   <activity android:label="@string/app_name" android:name="org.odk.collect.android.activities.MainMenuActivity" android:configChanges="orientation|keyboardHidden">
       <intent-filter>
