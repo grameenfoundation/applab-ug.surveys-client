@@ -43,193 +43,204 @@ import java.io.InputStream;
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
 public class SaveToDiskTask extends AsyncTask<Void, String, Integer> {
-    private final static String t = "SaveToDiskTask";
+	private final static String t = "SaveToDiskTask";
 
-    private FormSavedListener mSavedListener;
-    private String mInstancePath;
-    private Context mContext;
-    private Boolean mSave;
-    private Boolean mMarkCompleted;
+	private FormSavedListener mSavedListener;
+	private String mInstancePath;
+	private Context mContext;
+	private Boolean mSave;
+	private Boolean mMarkCompleted;
+	private Boolean skipValidityChecks;
 
-    public static final int SAVED = 500;
-    public static final int SAVE_ERROR = 501;
-    public static final int VALIDATE_ERROR = 502;
-    public static final int VALIDATED = 503;
-    public static final int SAVED_AND_EXIT = 504;
+	public static final int SAVED = 500;
+	public static final int SAVE_ERROR = 501;
+	public static final int VALIDATE_ERROR = 502;
+	public static final int VALIDATED = 503;
+	public static final int SAVED_AND_EXIT = 504;
 
+	/**
+	 * Initialize {@link FormEntryController} with {@link FormDef} from binary
+	 * or from XML. If given an instance, it will be used to fill the
+	 * {@link FormDef}.
+	 */
+	@Override
+	protected Integer doInBackground(Void... nothing) {
 
-    /**
-     * Initialize {@link FormEntryController} with {@link FormDef} from binary or from XML. If given
-     * an instance, it will be used to fill the {@link FormDef}.
-     */
-    @Override
-    protected Integer doInBackground(Void... nothing) {
+		if (!skipValidityChecks) {
+			// validation failed, pass specific failure
+			int validateStatus = validateAnswers(mMarkCompleted);
+			if (validateStatus != VALIDATED) {
+				return validateStatus;
+			}
+		}
 
-        // validation failed, pass specific failure
-        int validateStatus = validateAnswers(mMarkCompleted);
-        if (validateStatus != VALIDATED) {
-            return validateStatus;
-        }
+		FormEntryActivity.mFormEntryController.getModel().getForm()
+				.postProcessInstance();
 
-        FormEntryActivity.mFormEntryController.getModel().getForm().postProcessInstance();
+		if (mSave && exportData(mInstancePath, mContext, mMarkCompleted)) {
+			return SAVED_AND_EXIT;
+		} else if (exportData(mInstancePath, mContext, mMarkCompleted)) {
+			return SAVED;
+		}
 
-        if (mSave && exportData(mInstancePath, mContext, mMarkCompleted)) {
-            return SAVED_AND_EXIT;
-        } else if (exportData(mInstancePath, mContext, mMarkCompleted)) {
-            return SAVED;
-        }
+		return SAVE_ERROR;
 
-        return SAVE_ERROR;
+	}
 
-    }
+	public boolean exportData(String instancePath, Context context,
+			boolean markCompleted) {
 
+		ByteArrayPayload payload;
+		try {
 
-    public boolean exportData(String instancePath, Context context, boolean markCompleted) {
+			// assume no binary data inside the model.
+			FormInstance datamodel = FormEntryActivity.mFormEntryController
+					.getModel().getForm().getInstance();
+			XFormSerializingVisitor serializer = new XFormSerializingVisitor();
+			payload = (ByteArrayPayload) serializer
+					.createSerializedPayload(datamodel);
 
-        ByteArrayPayload payload;
-        try {
+			// write out xml
+			exportXmlFile(payload, instancePath);
 
-            // assume no binary data inside the model.
-            FormInstance datamodel =
-                FormEntryActivity.mFormEntryController.getModel().getForm().getInstance();
-            XFormSerializingVisitor serializer = new XFormSerializingVisitor();
-            payload = (ByteArrayPayload) serializer.createSerializedPayload(datamodel);
+		} catch (IOException e) {
+			Log.e(t, "Error creating serialized payload");
+			e.printStackTrace();
+			return false;
+		}
 
-            // write out xml
-            exportXmlFile(payload, instancePath);
+		FileDbAdapter fda = new FileDbAdapter();
+		fda.open();
+		File f = new File(instancePath);
+		Cursor c = fda.fetchFilesByPath(f.getAbsolutePath(), null);
+		if (!mMarkCompleted) {
+			if (c != null && c.getCount() == 0) {
+				fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
+						FileDbAdapter.STATUS_INCOMPLETE);
+			} else {
+				fda.updateFile(instancePath, FileDbAdapter.STATUS_INCOMPLETE);
+			}
+		} else {
+			if (c != null && c.getCount() == 0) {
+				fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
+						FileDbAdapter.STATUS_COMPLETE);
 
-        } catch (IOException e) {
-            Log.e(t, "Error creating serialized payload");
-            e.printStackTrace();
-            return false;
-        }
+			} else {
+				fda.updateFile(instancePath, FileDbAdapter.STATUS_COMPLETE);
+			}
+		}
+		// clean up cursor
+		if (c != null) {
+			c.close();
+		}
 
-        FileDbAdapter fda = new FileDbAdapter();
-        fda.open();
-        File f = new File(instancePath);
-        Cursor c = fda.fetchFilesByPath(f.getAbsolutePath(), null);
-        if (!mMarkCompleted) {
-            if (c != null && c.getCount() == 0) {
-                fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
-                    FileDbAdapter.STATUS_INCOMPLETE);
-            } else {
-                fda.updateFile(instancePath, FileDbAdapter.STATUS_INCOMPLETE);
-            }
-        } else {
-            if (c != null && c.getCount() == 0) {
-                fda.createFile(instancePath, FileDbAdapter.TYPE_INSTANCE,
-                    FileDbAdapter.STATUS_COMPLETE);
+		fda.close();
+		return true;
 
-            } else {
-                fda.updateFile(instancePath, FileDbAdapter.STATUS_COMPLETE);
-            }
-        }
-        // clean up cursor
-        if (c != null) {
-            c.close();
-        }
+	}
 
-        fda.close();
-        return true;
+	private boolean exportXmlFile(ByteArrayPayload payload, String path) {
 
-    }
+		// create data stream
+		InputStream is = payload.getPayloadStream();
+		int len = (int) payload.getLength();
 
+		// read from data stream
+		byte[] data = new byte[len];
+		try {
+			int read = is.read(data, 0, len);
+			if (read > 0) {
+				// write xml file
+				try {
+					// String filename = path + "/" +
+					// path.substring(path.lastIndexOf('/') + 1) + ".xml";
+					BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+					bw.write(new String(data, "UTF-8"));
+					bw.flush();
+					bw.close();
+					return true;
 
-    private boolean exportXmlFile(ByteArrayPayload payload, String path) {
+				} catch (IOException e) {
+					Log.e(t, "Error writing XML file");
+					e.printStackTrace();
+					return false;
+				}
+			}
+		} catch (IOException e) {
+			Log.e(t, "Error reading from payload data stream");
+			e.printStackTrace();
+			return false;
+		}
 
-        // create data stream
-        InputStream is = payload.getPayloadStream();
-        int len = (int) payload.getLength();
+		return false;
 
-        // read from data stream
-        byte[] data = new byte[len];
-        try {
-            int read = is.read(data, 0, len);
-            if (read > 0) {
-                // write xml file
-                try {
-                    // String filename = path + "/" +
-                    // path.substring(path.lastIndexOf('/') + 1) + ".xml";
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(path));
-                    bw.write(new String(data, "UTF-8"));
-                    bw.flush();
-                    bw.close();
-                    return true;
+	}
 
-                } catch (IOException e) {
-                    Log.e(t, "Error writing XML file");
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        } catch (IOException e) {
-            Log.e(t, "Error reading from payload data stream");
-            e.printStackTrace();
-            return false;
-        }
+	@Override
+	protected void onPostExecute(Integer result) {
+		synchronized (this) {
+			if (mSavedListener != null)
+				mSavedListener.savingComplete(result);
+		}
+	}
 
-        return false;
+	public void setFormSavedListener(FormSavedListener fsl) {
+		synchronized (this) {
+			mSavedListener = fsl;
+		}
+	}
 
-    }
+	public void setExportVars(String instancePath, Context context,
+			Boolean saveAndExit, Boolean markCompleted,
+			Boolean skipValidityChecks) {
+		mInstancePath = instancePath;
+		mContext = context;
+		mSave = saveAndExit;
+		mMarkCompleted = markCompleted;
+		this.skipValidityChecks = skipValidityChecks;
+	}
 
+	/**
+	 * Goes through the entire form to make sure all entered answers comply with
+	 * their constraints. Constraints are ignored on 'jump to', so answers can
+	 * be outside of constraints. We don't allow saving to disk, though, until
+	 * all answers conform to their constraints/requirements.
+	 * 
+	 * @param markCompleted
+	 * @return validatedStatus
+	 */
 
-    @Override
-    protected void onPostExecute(Integer result) {
-        synchronized (this) {
-            if (mSavedListener != null)
-                mSavedListener.savingComplete(result);
-        }
-    }
+	private int validateAnswers(Boolean markCompleted) {
 
+		FormEntryModel fem = FormEntryActivity.mFormEntryController.getModel();
+		FormIndex i = fem.getFormIndex();
 
-    public void setFormSavedListener(FormSavedListener fsl) {
-        synchronized (this) {
-            mSavedListener = fsl;
-        }
-    }
+		FormEntryActivity.mFormEntryController.jumpToIndex(FormIndex
+				.createBeginningOfFormIndex());
 
+		int event;
+		while ((event = FormEntryActivity.mFormEntryController
+				.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
+			if (event != FormEntryController.EVENT_QUESTION) {
+				continue;
+			} else {
+				int saveStatus = FormEntryActivity.mFormEntryController
+						.answerQuestion(fem.getQuestionPrompt()
+								.getAnswerValue());
+				if (markCompleted
+						&& saveStatus != FormEntryController.ANSWER_OK) {
+					return saveStatus;
+				}
+			}
+		}
 
-    public void setExportVars(String instancePath, Context context, Boolean saveAndExit,
-            Boolean markCompleted) {
-        mInstancePath = instancePath;
-        mContext = context;
-        mSave = saveAndExit;
-        mMarkCompleted = markCompleted;
-    }
+		FormEntryActivity.mFormEntryController.jumpToIndex(i);
+		return VALIDATED;
+	}
 
-
-    /**
-     * Goes through the entire form to make sure all entered answers comply with their constraints.
-     * Constraints are ignored on 'jump to', so answers can be outside of constraints. We don't
-     * allow saving to disk, though, until all answers conform to their constraints/requirements.
-     * 
-     * @param markCompleted
-     * @return validatedStatus
-     */
-
-    private int validateAnswers(Boolean markCompleted) {
-
-        FormEntryModel fem = FormEntryActivity.mFormEntryController.getModel();
-        FormIndex i = fem.getFormIndex();
-
-        FormEntryActivity.mFormEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-
-        int event;
-        while ((event = FormEntryActivity.mFormEntryController.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
-            if (event != FormEntryController.EVENT_QUESTION) {
-                continue;
-            } else {
-                int saveStatus =
-                    FormEntryActivity.mFormEntryController.answerQuestion(fem.getQuestionPrompt()
-                            .getAnswerValue());
-                if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
-                    return saveStatus;
-                }
-            }
-        }
-
-        FormEntryActivity.mFormEntryController.jumpToIndex(i);
-        return VALIDATED;
-    }
+	public void setExportVars(String mInstancePath, Context applicationContext,
+			boolean exit, boolean complete) {
+		setExportVars(mInstancePath, applicationContext, exit, complete, true);
+	}
 
 }

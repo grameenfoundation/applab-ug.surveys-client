@@ -15,6 +15,10 @@
 package org.odk.collect.android.activities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 import org.odk.collect.android.database.FileDbAdapter;
@@ -60,7 +64,32 @@ public class InstanceChooserList extends ListActivity {
         // get full path to the instance
         Cursor c = (Cursor) getListAdapter().getItem(position);
         String instancePath = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
+        
+        
+        File actualFile = new File(instancePath);
+        File tempFile = new File(instancePath + ".bak");
+        try {
+			FileInputStream in = new FileInputStream(actualFile);
+			FileOutputStream out = new FileOutputStream(tempFile);
+			
+			byte[] buf = new byte[Byte.MAX_VALUE];
+	        int len;
 
+	        while ((len = in.read(buf)) > 0) {
+	            out.write(buf, 0, len);
+	        }
+
+	        in.close();
+	        out.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
         // create intent for return and store path
         Intent i = new Intent();
         i.putExtra(FormEntryActivity.KEY_INSTANCEPATH, instancePath);
