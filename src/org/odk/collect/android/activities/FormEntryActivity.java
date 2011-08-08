@@ -882,10 +882,10 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 		return true;
 	}
 
-	private void deleteBackUpFile() {
-		File backUpFile = new File(mInstancePath + ".bak");
-		if (backUpFile.exists()) {
-			backUpFile.renameTo(new File(mInstancePath));
+	private void discardChanges() {
+		File backupFile = new File(mInstancePath + ".bak");
+		if (backupFile.exists()) {
+			backupFile.renameTo(new File(mInstancePath));
 		} else {
 			File file = new File(mInstancePath);
 			if (file.exists()) {
@@ -929,22 +929,76 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 						case 0:	// discard changes and exit
-							deleteBackUpFile();
-							finish();
-							break;
+							FileDbAdapter fda = new FileDbAdapter();
+                            fda.open();
+                            Cursor c = fda.fetchFilesByPath(mInstancePath, null);
+                            if (c != null && c.getCount() > 0) {
+                                Log.i(t, "prevously saved");
+                            }
+                            else {
+                                // not previously saved, cleaning up
+                                String instanceFolder =
+                                        mInstancePath.substring(0,
+                                                mInstancePath.lastIndexOf("/") + 1);
 
-						case 1: // save and exit
-							saveDataToDisk(true, isInstanceComplete());
-							break;
+                                String[] projection = {
+                                        Images.ImageColumns._ID
+                                };
+                                Cursor ci =
+                                        getContentResolver()
+                                                .query(Images.Media.EXTERNAL_CONTENT_URI,
+                                                        projection,
+                                                        "_data like '%" + instanceFolder + "%'",
+                                                        null, null);
+                                int del = 0;
+                                if (ci != null && ci.getCount() > 0) {
+                                    while (ci.moveToNext()) {
+                                        String id =
+                                                ci.getString(ci
+                                                        .getColumnIndex(Images.ImageColumns._ID));
 
-						case 2:// do nothing
-							break;
+                                        Log.i(
+                                                t,
+                                                "attempting to delete unused image: "
+                                                        + Uri.withAppendedPath(
+                                                                Images.Media.EXTERNAL_CONTENT_URI,
+                                                                id));
+                                        del +=
+                                                getContentResolver().delete(
+                                                        Uri.withAppendedPath(
+                                                                Images.Media.EXTERNAL_CONTENT_URI, id),
+                                                        null, null);
+                                    }
+                                }
+                                if (ci != null) {
+                                    ci.close();
+                                }
 
-						}
-					}
+                                Log.i(t, "Deleted " + del + " images from content provider");
+                                FileUtils.deleteFolder(instanceFolder);
+                            }
+                            // clean up cursor
+                            if (c != null) {
+                                c.close();
+                            }
+
+                            fda.close();
+                            discardChanges();
+                            finish();
+                            break;
+
+                        case 1: // save and exit
+                            saveDataToDisk(true, isInstanceComplete());
+                            break;
+
+                        case 2:// do nothing
+                            break;
+
+                        }
+                    }
 				}).create();
-		mAlertDialog.show();
-	}
+        mAlertDialog.show();
+    }
 
 	/**
 	 * Confirm clear dialog

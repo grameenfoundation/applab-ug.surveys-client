@@ -66,28 +66,7 @@ public class InstanceChooserList extends ListActivity {
         String instancePath = c.getString(c.getColumnIndex(FileDbAdapter.KEY_FILEPATH));
         
         
-        File actualFile = new File(instancePath);
-        File tempFile = new File(instancePath + ".bak");
-        try {
-			FileInputStream in = new FileInputStream(actualFile);
-			FileOutputStream out = new FileOutputStream(tempFile);
-			
-			byte[] buf = new byte[Byte.MAX_VALUE];
-	        int len;
-
-	        while ((len = in.read(buf)) > 0) {
-	            out.write(buf, 0, len);
-	        }
-
-	        in.close();
-	        out.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        makeBackupFile(instancePath);
         
         
         // create intent for return and store path
@@ -102,6 +81,32 @@ public class InstanceChooserList extends ListActivity {
         // don't close cursor or tab host delays closing
         finish();
     }
+
+
+	private void makeBackupFile(String instancePath) {
+		File actualFile = new File(instancePath);
+        File backupFile = new File(instancePath + ".bak");
+        try {
+			FileInputStream inputStream = new FileInputStream(actualFile);
+			FileOutputStream outputStream = new FileOutputStream(backupFile);
+			
+			byte[] inputBuffer = new byte[Byte.MAX_VALUE];
+	        int len;
+
+	        while ((len = inputStream.read(inputBuffer)) > 0) {
+	            outputStream.write(inputBuffer, 0, len);
+	        }
+
+	        inputStream.close();
+	        outputStream.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
     /**
