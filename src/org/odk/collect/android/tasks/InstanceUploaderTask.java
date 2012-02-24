@@ -48,7 +48,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
     // private static long MAX_BYTES = 1048576 - 1024; // 1MB less 1KB overhead
     InstanceUploaderListener mStateListener;
     String mUrl;
-    private static final int CONNECTION_TIMEOUT = 30000;
+    private static final int CONNECTION_TIMEOUT = 60000;
 
     public static final String SURVEY_LOCATION_HEADER = "x-applab-survey-location";
     public static final String INTERVIEWEEID_HEADER = "x-applab-interviewee-id";
