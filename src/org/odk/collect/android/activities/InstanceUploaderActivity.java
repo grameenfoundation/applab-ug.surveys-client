@@ -93,6 +93,11 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
             Toast.makeText(this, getString(R.string.upload_all_successful, totalCount),
                 Toast.LENGTH_SHORT).show();
 
+            FileDbAdapter fileDbAdapter = new FileDbAdapter();
+            fileDbAdapter.open();
+            fileDbAdapter.deleteFiles(result);
+            fileDbAdapter.removeOrphanInstances(this);
+            fileDbAdapter.close();
             success = true;
         } else {
             String s = totalCount - resultSize + " of " + totalCount;
@@ -112,12 +117,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
          * i < resultSize; i++) { fda.updateFile(result.get(i), FileDbAdapter.STATUS_SUBMITTED); } fda.close();
          */
         // Delete submitted data from database and then remove the data from sd
-        FileDbAdapter fileDbAdapter = new FileDbAdapter();
-        fileDbAdapter.open();
-        fileDbAdapter.deleteFiles(result);
-        fileDbAdapter.removeOrphanInstances(this);
-        fileDbAdapter.close();
-        
+
         finish();
     }
 
