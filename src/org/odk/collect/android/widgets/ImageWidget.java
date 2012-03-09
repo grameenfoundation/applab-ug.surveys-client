@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 import org.javarosa.core.model.data.IAnswerData;
@@ -35,8 +34,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.hardware.Camera;
-import javax.imageio.ImageIO;
 import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.util.Log;
@@ -236,14 +233,6 @@ public class ImageWidget extends LinearLayout implements IQuestionWidget, IBinar
         }
     }
 
-    private static BufferedImage resizeImage(BufferedImage originalImage, int type){
-        BufferedImage resizedImage = new BufferedImage(400, 300, type);
-    	Graphics2D g = resizedImage.createGraphics();
-    	g.drawImage(originalImage, 0, 0, 400, 300, null);
-    	g.dispose();
-     
-    	return resizedImage;
-        }
     private String getPathFromUri(Uri uri) {
         // find entry in content provider
         Cursor c = getContext().getContentResolver().query(uri, null, null, null, null);
