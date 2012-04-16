@@ -144,7 +144,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                 }
                 else {
                     Toast toast = Toast.makeText(getApplicationContext(),
-                            "Farmer\'s ID cannot be empty", Toast.LENGTH_SHORT);
+                            "Respondent\'s ID cannot be empty", Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
