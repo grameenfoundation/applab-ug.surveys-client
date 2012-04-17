@@ -41,7 +41,7 @@
 <string name="data">Data</string>
 <string name="data_saved_error">Sorry, data save failed!</string>
 <string name="data_saved_ok">Data successfully saved!</string>
-<string name="default_server">http://ckwapps.applab.org:8888/zebra</string>
+<string name="default_server">http://test.applab.org:8888/zebra</string>
 <string name="delete_confirm">Delete %s item(s)?</string>
 <string name="delete_file">Delete Selected</string>
 <string name="delete_no">Do Not Delete</string>
@@ -146,6 +146,6 @@
 <string name="username">Username</string>
 <string name="view_hierarchy">Go To Prompt</string>
 <string name="app_name">CKW Surveys</string>
-<string name="app_version">3.4.0</string>
+<string name="app_version">4.1 pre1</string>
 <string name="odk_version">1.1.5</string>
 </resources>
