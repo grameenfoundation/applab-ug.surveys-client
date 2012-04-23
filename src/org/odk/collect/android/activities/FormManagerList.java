@@ -312,7 +312,7 @@ public class FormManagerList extends ListActivity {
             if (instanceFormDefs.contains(filePath)) {
                 String message = filePath.substring(filePath.lastIndexOf('/') + 1) + " Cannot be deleted because it has data. Please submit or delete the data first before deleting the form.";
                 message = message.replace(".xml", " Form");
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 return true;
             }
         }
