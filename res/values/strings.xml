@@ -148,4 +148,21 @@
 <string name="app_name">CKW Surveys</string>
 <string name="app_version">4.1.0</string>
 <string name="odk_version">1.1.5</string>
+<string name="register_new_farmer">Register New Farmer</string>
+<string name="forgot_farmerid">Forgot Farmer\'s ID</string>
+<string name="registration_successful">Registration Successful</string>
+<string name="registration_failed">Failed to save farmer registration record.</string>
+<string name="result_cancelled">Unable to register farmer. \nCheck the ID or try again later.</string>
+<string name="cant_find_id">Unable to find ID. Try again later.</string>
+<string name="invalid_farmer_id">Invalid Farmer ID.</string>
+<string name="empty_farmer_id">Farmer\'s ID cannot be empty</string>
+<string name="test_survey_msg1">The ID you entered is not valid,</string>
+<string name="test_survey_msg2">it should be 2 letters followed by at least 4 numbers.</string>
+<string name="test_survey_msg3">\nWould you like to do a test survey instead?</string>
+<string name="test_survey_msg4"> NOTE: You will NOT be compensated for doing a test survey.</string>
+<string name="registration_form_failed">Failed to get farmer registration form. Please try again</string>
+<string name="loading_form">Loading Form. Please wait ...</string>
+<string name="empty_respondent_id">Farmer\'s ID cannot be empty</string>
+<string name="perform_test_survey">Perform Test Survey?</string>
+<string name="serialized_payload_error">Error creating serialized payload</string>
 </resources>
