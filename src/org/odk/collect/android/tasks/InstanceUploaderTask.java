@@ -81,6 +81,7 @@ public class InstanceUploaderTask extends AsyncTask<String, Integer, ArrayList<S
 
             // Setup client
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
+            Log.d("URL", "url="+mUrl);
             HttpPost httppost = new HttpPost(mUrl);
             HttpHelpers.addCommonHeaders(httppost);
 

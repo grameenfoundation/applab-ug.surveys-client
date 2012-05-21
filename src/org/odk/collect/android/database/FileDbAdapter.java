@@ -218,7 +218,9 @@ public class FileDbAdapter {
      * @return id of the new file
      */
     public long createFile(String path, String type, String status) {
+        Log.d("HERE", "we're here!!!");
         File f = new File(path);
+        Log.d("PATH", path);
         ContentValues cv = new ContentValues();
 
         cv.put(KEY_FILEPATH, f.getAbsolutePath());

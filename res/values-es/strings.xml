@@ -64,7 +64,7 @@
 <string name="entering_repeat">Adicionar Grupo</string>
 <string name="entering_repeat_ask">Adicionar nuevo grupo?</string>
 <string name="enter_data">Iniciar nueva Forma</string>
-<string name="enter_data_button">Start New Form (%s)</string>
+<string name="enter_data_button">Iniciar nueva Forma (%s)</string>
 <string name="enter_data_description">%s a sido seleccionado.</string>
 <string name="enter_data_message">Para navegar, deslize su dedo horizontalmente sobre la pantalla. Presione el boton Menu para mas opciones.</string>
 <string name="error_downloading">Error obteniendo forma</string>
@@ -148,4 +148,22 @@
 <string name="app_name">CKW Surveys</string>
 <string name="app_version">3.4.0</string>
 <string name="odk_version">1.1.5</string>
+<!--added for CKW-2956-->
+<string name="register_new_farmer">Registrar</string>
+<string name="forgot_farmerid">Recordar ID</string>
+<string name="registration_successful">Registro exitoso</string>
+<string name="registration_failed">Error guardando el registro.</string>
+<string name="result_cancelled">No se pudo realizar el registro. \nRevise el ID o intente mas tarde.</string>
+<string name="cant_find_id">ID no encontrado. Intente mas tarde.</string>
+<string name="invalid_farmer_id">ID de productor invalido.</string>
+<string name="empty_farmer_id">El ID del productor no puede estar en blanco</string>
+<string name="test_survey_msg1">El ID no es valido,</string>
+<string name="test_survey_msg2">debe tener 2 letras seguido de por lo menos 4 digitos.</string>
+<string name="test_survey_msg3">\nDesea hacer una encuesta de prueba?</string>
+<string name="test_survey_msg4"> NOTA: Las encuestas de prueba no son compensadas.</string>
+<string name="registration_form_failed">No se pudo obtener la forma de registro. Por favor intente de nuevo</string>
+<string name="loading_form">Cargando la forma. Un momento por favor ...</string>
+<string name="empty_respondent_id">El ID del productor no puede estar en blanco</string>
+<string name="perform_test_survey">Desea hacer una encuesta de prueba?</string>
+<string name="serialized_payload_error">Error creando la carga serializada</string>
 </resources>

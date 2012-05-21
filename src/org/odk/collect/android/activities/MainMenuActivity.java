@@ -144,14 +144,14 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                 }
                 else {
                     Toast toast = Toast.makeText(getApplicationContext(),
-                            "Respondent\'s ID cannot be empty", Toast.LENGTH_SHORT);
+                            getString(R.string.empty_respondent_id), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
         });
 
         registerFarmerButton = (Button)findViewById(R.id.register_farmer_button);
-        registerFarmerButton.setText("Register New Farmer");
+        registerFarmerButton.setText(R.string.register_new_farmer);
         registerFarmerButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
@@ -159,9 +159,12 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                         REGISTRATION_CODE);
             }
         });
+        //toggle showing of register farmer button
+        String showFarmerRegistrationButton = getResources().getString(R.string.show_farmer_registration);
+        this.registerFarmerButton.setVisibility(showFarmerRegistrationButton.equalsIgnoreCase("yes") ? View.VISIBLE : View.GONE);
 
         forgotIdButton = (Button)findViewById(R.id.forgot_id_button);
-        forgotIdButton.setText("Forgot Farmer's ID");
+        forgotIdButton.setText(R.string.forgot_farmerid);
         forgotIdButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
@@ -169,6 +172,9 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                         FORGOT_ID_CODE);
             }
         });
+     // toggle showing of forgot farmer button
+        String showForgotFarmerButton = getResources().getString(R.string.show_forgot_farmer);
+        this.forgotIdButton.setVisibility(showForgotFarmerButton.equalsIgnoreCase("yes") ? View.VISIBLE : View.GONE);
 
         // review data button. expects a result.
         mReviewDataButton = (Button)findViewById(R.id.review_data);
@@ -278,10 +284,10 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                     Bundle bundle = intent.getBundleExtra(BrowserActivity.EXTRA_DATA_INTENT);
                     bundle.putString(FarmerRegistrationAdapter.KEY_LOCATION, GpsManager.getInstance().getLocationAsString());
 
-                    String message = "Registration successful.";
+                    String message = getString(R.string.registration_successful) ;
                     final long result = this.farmerRegController.saveNewFarmerRegistration(bundle);
                     if (result < 0) {
-                        message = "Failed to save farmer registration record.";
+                        message = getString(R.string.registration_failed);
                     }
 
                     BrowserResultDialog.show(this, message,
@@ -300,7 +306,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                     // Show error dialog
                     BrowserResultDialog
                             .show(this,
-                                    "Unable to register farmer. \nCheck the ID or try again later.");
+                                    getString(R.string.result_cancelled));
                 }
                 break;
             case FORGOT_ID_CODE:
@@ -322,7 +328,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                     // reset the Farmer ID
                     GlobalConstants.intervieweeName = "";
                     BrowserResultDialog.show(this,
-                            "Unable to find ID. Try again later.");
+                            getString(R.string.cant_find_id));
                 }
                 break;
         }
@@ -488,19 +494,19 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(),
-                        "Invalid Farmer ID.", Toast.LENGTH_SHORT);
+                        getString(R.string.invalid_farmer_id), Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
         else {
             Toast toast = Toast.makeText(getApplicationContext(),
-                    "Farmer\'s ID cannot be empty", Toast.LENGTH_SHORT);
+                    getString(R.string.empty_farmer_id), Toast.LENGTH_SHORT);
             toast.show();
         }
     }
 
     private boolean checkID(String text) {
-        Pattern pattern = Pattern.compile("[a-zA-Z]{2}[0-9]{4,5}+");
+        Pattern pattern = Pattern.compile(getResources().getString(R.string.farmer_id_regex));
         Matcher matcher = pattern.matcher(text);
         return matcher.matches();
     }
@@ -508,12 +514,12 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
     void showTestSurveyDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setIcon(R.drawable.help);
-        builder.setTitle("Perform Test Survey?");
+        builder.setTitle(getString(R.string.perform_test_survey));
         builder.setMessage(
-                "The ID you entered is not valid, "
-                        + "it should be 2 letters followed by at least 4 numbers."
-                        + "\nWould you like to do a test survey instead?"
-                        + " NOTE: You will NOT be compensated for doing a test survey.")
+                getString(R.string.test_survey_msg1)
+                        + getString(R.string.test_survey_msg2)
+                        + getString(R.string.test_survey_msg3)
+                        + getString(R.string.test_survey_msg4))
                 .setCancelable(false)
                 .setPositiveButton("Yes",
                         new DialogInterface.OnClickListener() {
@@ -549,7 +555,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
                 startActivityForResult(webActivity, requestCode);
             }
             else {
-                errorMessage = "Failed to get the farmer registration form. Please try again.";
+                errorMessage = getString(R.string.registration_form_failed);
             }
 
             // Dismiss the progress window.
@@ -572,7 +578,7 @@ public class MainMenuActivity extends ApplabActivity implements Runnable {
     protected Dialog onCreateDialog(int id) {
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(getTitle());
-        progressDialog.setMessage("Loading Form. Please wait ...");
+        progressDialog.setMessage(getString(R.string.loading_form));
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
 
